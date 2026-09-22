@@ -1,0 +1,122 @@
+<template>
+  <div id="root" data-composition-id="03-demo" data-duration="14" data-width="1920" data-height="1080">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .clip { position: absolute; inset: 0; }
+      [id="f03-demo-bg"] { background: #0B0E13; }
+
+      [id="f03-demo-camera"] {
+        position: absolute; inset: 0;
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+
+      /* left column: h2 + the verdict legend */
+      [id="f03-demo-h2"] {
+        position: absolute; left: 96px; top: 250px; width: 560px;
+        font-size: 2.6cqw; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em;
+        color: #F2F4F7;
+      }
+      [id="f03-demo-list"] {
+        position: absolute; left: 96px; top: 420px;
+        display: flex; flex-direction: column; align-items: flex-start; gap: 18px;
+      }
+      .pill-03-demo {
+        display: flex; align-items: center; gap: 16px;
+        height: 68px; padding: 0 30px 0 24px;
+        border-radius: 100px;
+        border: 1.5px solid var(--c);
+        background: color-mix(in srgb, var(--c) 8%, transparent);
+        color: var(--c);
+        font-size: 1.45cqw; font-weight: 600; letter-spacing: -0.01em;
+        white-space: nowrap;
+        clip-path: inset(0px 100% 0px 0px round 100px);
+      }
+      .pill-03-demo i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
+
+      /* right: the real screen capture, cropped to the LinkedIn page (OS + browser chrome removed).
+         Source 1280×720; page region x 340..930, y 88..684, shown at 1.4× → 826×834. */
+      [id="f03-demo-window"] {
+        position: absolute; left: 867px; top: 123px; width: 826px; height: 834px;
+        border-radius: 14px;
+        border: 1.5px solid rgba(240, 180, 41, 0.2);
+        background: #F3F2EF;
+        overflow: hidden;
+        will-change: transform, opacity;
+      }
+      [id="f03-demo-capture"] {
+        position: absolute; left: -476px; top: -123px; width: 1792px; height: 1008px;
+        display: block;
+      }
+    </style>
+
+    <div id="f03-demo-bg" class="clip" data-start="0" data-duration="14" data-track-index="0"></div>
+
+    <div class="clip" data-start="0" data-duration="14" data-track-index="1">
+      <div id="f03-demo-camera">
+        <div id="f03-demo-h2">Every post gets a verdict</div>
+        <div id="f03-demo-list">
+          <div class="pill-03-demo" id="f03-demo-pill-1" style="--c:#F0B429"><i></i>golden nugget</div>
+          <div class="pill-03-demo" id="f03-demo-pill-2" style="--c:#2F9E6F"><i></i>useful</div>
+          <div class="pill-03-demo" id="f03-demo-pill-3" style="--c:#D9534F"><i></i>slop</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- untimed wrapper: timing lives on the <video> only (video_nested_in_timed_element) -->
+    <div id="f03-demo-window">
+      <video
+        id="f03-demo-capture"
+        data-layout-allow-overflow
+        src="assets/demo-capture.mp4"
+        data-start="0"
+        data-duration="14"
+        data-media-start="34.5"
+        data-track-index="2"
+        muted
+        playsinline
+      ></video>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (() => {
+        const tl = gsap.timeline({ paused: true });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["03-demo"] = tl;
+
+        const $ = (s) => document.getElementById("f03-demo-" + s);
+        const camera = $("camera"), win = $("window"), h2 = $("h2");
+        const pills = [1, 2, 3].map((n) => $("pill-" + n));
+
+        // window rises and settles; h2 fades in
+        tl.fromTo(win, { y: 220, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }, 0);
+        tl.fromTo(h2, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.5);
+
+        // steady push on the copy column only, 1.00 → 1.03, then rest
+        const cam = { scale: 1 };
+        tl.to(cam, {
+          scale: 1.03, duration: 10, ease: "sine.out",
+          onUpdate: () => { camera.style.transform = `scale(${cam.scale})`; },
+        }, 0);
+
+        // legend pills wipe in while the real feed scrolls
+        [2.0, 5.5, 9.0].forEach((at, i) => {
+          tl.fromTo(pills[i],
+            { clipPath: "inset(0px 100% 0px 0px round 100px)" },
+            { clipPath: "inset(0px 0% 0px 0px round 100px)", duration: 0.5, ease: "power3.out" },
+            at);
+        });
+
+        tl.set({}, {}, 14); // pin duration
+      })();
+    </script>
+  </div>
+</template>

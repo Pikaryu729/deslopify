@@ -7,7 +7,7 @@ destination: website-embed
 aspect: 1920x1080
 language: en
 audience: LinkedIn users who are tired of engagement bait — developers and builders first
-length: 30s
+length: 42s
 angle: sell
 narration: no
 style_preset: blue-professional
@@ -24,14 +24,14 @@ on-screen copy — no voiceover, no music. Confident, plain, developer-honest; n
 
 - ../../assets/icon.png — the app icon (dark navy squircle, feed card + funnel + sparkles); brand sting and CTA.
 - ../../assets/wordmark-dark.png — the wordmark for dark backgrounds (mark + white "deslopify"); lockups.
-- capture/assets/screenshot-1-feed.png — the real feed with gold/green/red edges and verdict badges; the demo beat.
+- assets/demo-capture.mp4 — a real screen recording of the feed being graded as it scrolls (demo from ~34.5s); the demo beat.
 - capture/assets/it-shows-its-work.png — the explanation panel (probabilities, signals, tokens); the proof beat.
 - capture/assets/deslopify-settings-provider-and-api-key-.png — the settings page; the "yours to tune" beat.
 
 ## Customizations
 
 - Silent: `music: none` and no `SCRIPT.md`. Reveal pacing follows the on-screen copy instead of a voiceover.
-- Feature the captured screens as-is; don't rebuild the LinkedIn feed in HTML.
+- Feature the captured screens and the recording as-is; don't rebuild the LinkedIn feed in HTML and never fake scroll footage.
 - End card carries the site URL pikaryu729.github.io/deslopify and "Chrome · Firefox".
 
 ## Notes

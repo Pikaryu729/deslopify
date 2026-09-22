@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="assets/promo.mp4"><img src="assets/promo.gif" alt="Thirty-second promo: a LinkedIn feed graded as you scroll" width="720" /></a>
+  <a href="assets/promo.mp4"><img src="assets/promo.gif" alt="Forty-second promo: a LinkedIn feed graded as you scroll" width="720" /></a>
 </p>
 
 # Deslopify

@@ -1,6 +1,6 @@
 ---
 format: 1920x1080
-duration: 30s
+duration: 42s
 message: "Your LinkedIn feed, graded as you scroll — so you only read what's worth it"
 arc: BAB — before (a feed full of slop) → bridge (Deslopify) → step 1 (graded feed) → step 2 (shows its work) → step 3 (yours to tune) → trust → CTA
 audience: LinkedIn users tired of engagement bait — developers and builders first
@@ -78,28 +78,28 @@ Scene 3 (2.4–4.5s): beneath the lockup, "your feed, graded as you scroll." typ
 
 ## Frame 3 — The graded feed
 
-- scene: The real LinkedIn feed screenshot rises as a floating window and scrolls; three verdict pills land beside it in gold, green, red
+- scene: The real screen recording of the LinkedIn feed plays in a floating window while three verdict pills land beside it in gold, green, red
 - voiceover: "Every post gets a verdict — golden nugget — useful — slop."
-- duration: 6s
-- poster: 5.2s
+- duration: 14s
+- poster: 12s
 - transition_in: push-slide LEFT
 - status: animated
-- src: compositions/frames/03-feed.html
+- src: compositions/frames/03-demo.html
 - type: feature_showcase
 - persuasion: Show-don't-tell proof
 - beat: clarity
-- blueprint: device-surface-showcase (Adapt — floating-window push-scroll variant, cursorless)
-- focal: assets/screenshot-1-feed.png
-- roles: screenshot-1-feed = cutout
-- asset_candidates: assets/screenshot-1-feed.png — the LinkedIn feed with posts edged gold/green/red and verdict badges in the author row
+- blueprint: device-surface-showcase (Adapt — floating-window footage variant)
+- focal: assets/demo-capture.mp4 (source 34.5s–48.5s)
+- roles: demo-capture = footage
+- asset_candidates: assets/demo-capture.mp4 — the user's own screen recording of the feed being graded as they scroll; the browser and OS chrome are cropped out
 
-narrativeRole: step 1 — the core loop, shown on the real surface.
+narrativeRole: step 1 — the core loop, shown on the real surface, with real scrolling.
 keyMessage: three verdicts, painted on the feed itself.
 
-Adapt: keep the signature — a held floating surface whose content advances while the camera pushes; the "screens" are scroll positions of the one screenshot, and the side copy is the three verdict pills revealed one per cue.
-Scene 1 (0.0–1.4s): `bg` canvas. The feed screenshot, inside a `card-tinted` window (~58% of frame width), slides up from below-centre into the right 60% of an asymmetric 40/60 layout and settles (`power3`). A slow camera push begins on the root (`multi-phase-camera`, steady push only, ≤ 4% total). "Every post gets a verdict" fades in as h2 in the left 40%, upper third.
-Scene 2 (1.4–4.6s): the screenshot's content scrolls upward inside its window in three eased steps (`viewport-change` on an inner `.world` wrapper — clip the window, move the image), pausing on each graded post. On each pause a verdict pill lands in the left column beneath the h2 via mask-wipe (`techniques.md` clip-path): "golden nugget" (gold dot + gold border, `primary`), then "useful" (`positive`), then "slop" (`negative`) — one pill per scroll stop, accumulating as a vertical list (`grid-card-assemble` list build).
-Scene 3 (4.6–6.0s): scroll rests on the red-edged slop post; the push stops. Hold still on the three pills + the feed. No breathing.
+Adapt: the window holds the recording (not a screenshot), so the content advances on its own — no synthetic scroll. The camera push stays on the copy column only.
+Scene 1 (0.0–1.4s): `bg` canvas. The recording, inside a `card-tinted` window cropped to the LinkedIn page at 1.4×, slides up from below-centre into the right half of a 40/60 layout and settles (`power3`). "Every post gets a verdict" fades in as h2 in the left column, upper third.
+Scene 2 (1.4–10s): the feed scrolls in the recording. Verdict pills mask-wipe into the left column at 2.0s / 5.5s / 9.0s: "golden nugget" (`primary`), "useful" (`positive`), "slop" (`negative`), accumulating as a vertical list.
+Scene 3 (10–14s): hold — footage keeps playing, pills at rest, push stopped.
 
 ## Frame 4 — It shows its work
 
