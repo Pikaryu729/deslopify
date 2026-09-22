@@ -1,0 +1,74 @@
+<template>
+  <div id="root" data-composition-id="06-privacy" data-duration="4.5" data-width="1920" data-height="1080">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      #root .clip { position: absolute; inset: 0; }
+      .f06-privacy-bg { background: #0B0E13; }
+      #f06-privacy-stack {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .f06-privacy-line {
+        width: 34cqw;
+        padding: 1.4cqw 0;
+        text-align: center;
+        font-size: 2.6cqw;
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: #F2F4F7;
+        border-top: 1px solid rgba(240, 180, 41, 0.2);
+        opacity: 0;
+      }
+      .f06-privacy-line:first-child { border-top: 0; }
+      #f06-privacy-pill {
+        margin-top: 2.2cqw;
+        padding: 10px 22px;
+        border-radius: 100px;
+        background: rgba(240, 180, 41, 0.08);
+        color: #F0B429;
+        font-size: 1.4cqw;
+        font-weight: 600;
+        opacity: 0;
+      }
+    </style>
+
+    <div class="clip f06-privacy-bg" data-start="0" data-duration="4.5" data-track-index="0"></div>
+
+    <div class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <div id="f06-privacy-stack">
+        <div class="f06-privacy-line">No account.</div>
+        <div class="f06-privacy-line">No analytics.</div>
+        <div class="f06-privacy-line">No server of ours.</div>
+        <div id="f06-privacy-pill">free &amp; open source</div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+        var root = document.querySelector('[data-composition-id="06-privacy"]');
+        var lines = root.querySelectorAll(".f06-privacy-line");
+        // Scene 1 (0–0.4s): bare bg. Scene 2 (0.4–2.8s): one move — slide-up + crossfade, per-line stagger on the copy cadence.
+        tl.fromTo(lines, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.6 }, 0.4);
+        tl.fromTo(root.querySelector("#f06-privacy-pill"), { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }, 2.2);
+        // Scene 3 (2.8–4.0s): hold. Nothing moves.
+        window.__timelines["06-privacy"] = tl;
+      })();
+    </script>
+  </div>
+</template>

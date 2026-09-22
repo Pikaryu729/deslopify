@@ -1,0 +1,141 @@
+<template>
+  <div id="root" data-composition-id="03-feed" data-duration="6.5" data-width="1920" data-height="1080">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .clip { position: absolute; inset: 0; }
+      [id="f03-feed-bg"] { background: #0B0E13; }
+
+      /* multi-phase-camera: one wrapper, one writer (see script) */
+      [id="f03-feed-camera"] {
+        position: absolute; inset: 0;
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+
+      /* left 40%: h2 + the verdict list */
+      [id="f03-feed-h2"] {
+        position: absolute; left: 96px; top: 250px; width: 600px;
+        font-size: 2.6cqw; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em;
+        color: #F2F4F7;
+      }
+      [id="f03-feed-list"] {
+        position: absolute; left: 96px; top: 420px;
+        display: flex; flex-direction: column; align-items: flex-start; gap: 18px;
+      }
+      .pill-03-feed {
+        display: flex; align-items: center; gap: 16px;
+        height: 68px; padding: 0 30px 0 24px;
+        border-radius: 100px;
+        border: 1.5px solid var(--c);
+        background: color-mix(in srgb, var(--c) 8%, transparent);
+        color: var(--c);
+        font-size: 1.45cqw; font-weight: 600; letter-spacing: -0.01em;
+        white-space: nowrap;
+        clip-path: inset(0px 100% 0px 0px round 100px);
+      }
+      .pill-03-feed i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
+
+      /* right 60%: card-tinted floating window, 1054×664, chrome + clipped viewport */
+      [id="f03-feed-window"] {
+        position: absolute; left: 817px; top: 168px; width: 1054px; height: 664px;
+        border-radius: 14px;
+        border: 1.5px solid rgba(240, 180, 41, 0.2);
+        background: rgba(240, 180, 41, 0.04);
+        overflow: hidden;
+        will-change: transform;
+      }
+      [id="f03-feed-chrome"] {
+        position: relative; height: 44px;
+        display: flex; align-items: center; gap: 8px; padding: 0 18px;
+        border-bottom: 1px solid rgba(240, 180, 41, 0.2);
+      }
+      [id="f03-feed-chrome"] i { width: 10px; height: 10px; border-radius: 50%; background: #6B7280; }
+      [id="f03-feed-chrome"] b {
+        position: absolute; left: 377px; top: 13px; width: 300px; height: 18px;
+        border-radius: 100px; background: rgba(240, 180, 41, 0.08);
+      }
+      [id="f03-feed-viewport"] {
+        position: relative; height: 620px; overflow: hidden;
+        background: #F3F2EF; /* the page's own ground, so the scroll end reads as page, not void */
+      }
+      /* viewport-change: the .world is the moving layer; the centre column is cropped in at 1.7× */
+      [id="f03-feed-world"] {
+        position: absolute; left: -561px; top: 0; width: 2176px; height: 1360px;
+        will-change: transform;
+      }
+      [id="f03-feed-world"] img { display: block; width: 2176px; height: 1360px; }
+    </style>
+
+    <div id="f03-feed-bg" class="clip" data-start="0" data-duration="6.5" data-track-index="0"></div>
+
+    <div class="clip" data-start="0" data-duration="6.5" data-track-index="1">
+      <div id="f03-feed-camera">
+        <div id="f03-feed-h2">Every post gets a verdict</div>
+        <div id="f03-feed-list">
+          <div class="pill-03-feed" id="f03-feed-pill-1" style="--c:#F0B429"><i></i>golden nugget</div>
+          <div class="pill-03-feed" id="f03-feed-pill-2" style="--c:#2F9E6F"><i></i>useful</div>
+          <div class="pill-03-feed" id="f03-feed-pill-3" style="--c:#D9534F"><i></i>slop</div>
+        </div>
+
+        <div id="f03-feed-window">
+          <div id="f03-feed-chrome"><i></i><i></i><i></i><b></b></div>
+          <div id="f03-feed-viewport">
+            <div id="f03-feed-world" data-layout-allow-overflow>
+              <img src="assets/screenshot-1-feed.png" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (() => {
+        const tl = gsap.timeline({ paused: true });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["03-feed"] = tl;
+
+        const $ = (s) => document.getElementById("f03-feed-" + s);
+        const camera = $("camera"), win = $("window"), world = $("world"), h2 = $("h2");
+        const pills = [1, 2, 3].map((n) => $("pill-" + n));
+
+        // Scene 1 (0.0–1.4): window rises from below-centre and settles; h2 fades in; steady push begins
+        tl.fromTo(win, { y: 220, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }, 0);
+        tl.fromTo(h2, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.5);
+
+        // multi-phase-camera, steady-push mode: 1.00 → 1.04 over Scenes 1–2, at rest for the Scene 3 hold.
+        // Drift omitted on purpose — the packet asks for "no breathing" on the hold.
+        const cam = { scale: 1 };
+        tl.to(cam, {
+          scale: 1.04, duration: 4.6, ease: "sine.out",
+          onUpdate: () => { camera.style.transform = `scale(${cam.scale})`; },
+        }, 0);
+
+        // Scene 2 (1.4–4.6): three eased scroll steps (viewport-change on .world), a pill mask-wipes in on each pause.
+        // Stops (image scaled 1.7×): -24 = nugget post to the top edge; -420 = useful post centred; -740 = scroll end, slop post low.
+        const steps = [
+          { at: 1.4, y: -24,  pill: 0 },
+          { at: 2.5, y: -420, pill: 1 },
+          { at: 3.7, y: -740, pill: 2 },
+        ];
+        steps.forEach(({ at, y, pill }) => {
+          tl.to(world, { y, duration: 0.55, ease: "power3.inOut" }, at);
+          tl.fromTo(pills[pill],
+            { clipPath: "inset(0px 100% 0px 0px round 100px)" },
+            { clipPath: "inset(0px 0% 0px 0px round 100px)", duration: 0.5, ease: "power3.out" },
+            at + 0.5);
+        });
+
+        // Scene 3 (4.6–6.0): hold — scroll rests on the slop post, push stopped, no motion.
+        tl.set({}, {}, 6); // pin duration
+      })();
+    </script>
+  </div>
+</template>

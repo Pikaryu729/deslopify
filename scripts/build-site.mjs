@@ -179,5 +179,6 @@ for (const file of screenshots) {
   await copyFile(resolve(root, "store/assets", file), resolve(assetsDir, file));
 }
 await copyFile(resolve(root, "assets/wordmark-dark.png"), resolve(assetsDir, "wordmark-dark.png"));
+await copyFile(resolve(root, "assets/promo.mp4"), resolve(assetsDir, "promo.mp4"));
 
 console.log(`site built: docs/privacy.html (${policy.split("\n").length} lines of policy) + ${screenshots.length} assets`);

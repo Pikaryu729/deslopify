@@ -231,11 +231,14 @@ main {
 }
 
 .hero-shot img,
+.hero-shot video,
 .section--split img {
   border-radius: 14px;
   border: 1px solid var(--line);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* ---------------------------------------------------------------- sections */

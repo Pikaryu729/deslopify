@@ -2,3 +2,10 @@ node_modules/
 dist/
 *.log
 .DS_Store
+# HyperFrames video projects: keep the source, not the build products
+videos/*/node_modules/
+videos/*/capture/
+videos/*/.hyperframes/
+videos/*/.media/
+videos/*/renders/
+videos/*/snapshots/

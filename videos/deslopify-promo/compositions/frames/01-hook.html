@@ -1,0 +1,133 @@
+<template>
+  <div id="root" data-composition-id="01-hook" data-width="1920" data-height="1080" data-duration="4.4">
+    <style>
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      #root .clip {
+        position: absolute;
+        inset: 0;
+      }
+      #root [data-part="bg"] {
+        background: #0B0E13;
+      }
+      /* line centred at ~0.42 × height, well above the y=900 keep-out */
+      #root [data-part="stage"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 84cqh;
+      }
+      #root [data-part="line"] {
+        display: flex;
+        align-items: baseline;
+        gap: 0.28em;
+        white-space: nowrap;
+        font-size: 4.2cqw; /* h1 */
+        font-weight: 700;
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        color: #F2F4F7;
+      }
+      #root [data-part="word"] {
+        display: inline-block;
+        opacity: 0;
+      }
+      /* swap slot: all token states stacked in one grid cell so the slot's
+         width is the widest state — the fixed line never shifts on a swap */
+      #root [data-part="slot"] {
+        display: grid;
+        align-items: baseline;
+        justify-items: start;
+      }
+      #root [data-part="token"] {
+        grid-area: 1 / 1;
+        visibility: hidden;
+        color: #9AA1AB;
+      }
+      #root [data-part="token"][data-final] {
+        position: relative;
+        color: #D9534F;
+        transform: scale(1.08);
+        transform-origin: left center;
+      }
+      #root [data-part="underline"] {
+        position: absolute;
+        left: 0.02em;
+        right: 0.06em;
+        bottom: -0.04em;
+        height: 0.08em;
+        border-radius: 3px;
+        background: #D9534F;
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+    </style>
+
+    <div class="clip" data-part="bg" data-start="0" data-duration="4.4" data-track-index="0"></div>
+
+    <div class="clip" data-part="stage" data-start="0" data-duration="4.4" data-track-index="1">
+      <div data-part="line">
+        <span data-part="word" id="f01-hook-w1">Stop</span>
+        <span data-part="word" id="f01-hook-w2">reading</span>
+        <span data-part="slot" id="f01-hook-slot">
+          <span data-part="token">engagement bait.</span>
+          <span data-part="token">AI filler.</span>
+          <span data-part="token">humblebrags.</span>
+          <span data-part="token" data-final>slop.<span data-part="underline" id="f01-hook-underline"></span></span>
+        </span>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        var DURATION = 4;
+        var tl = gsap.timeline({ paused: true });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["01-hook"] = tl;
+
+        // Scene 1 (0.0–0.9s): "Stop reading" — two-word staggered arrival.
+        tl.fromTo("#f01-hook-w1", { opacity: 0, y: 14, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "power3.out" }, 0.08);
+        tl.fromTo("#f01-hook-w2", { opacity: 0, y: 14, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "power3.out" }, 0.38);
+
+        // Scene 2–3: discrete-text-sequence — the slot hard-cuts through its
+        // states; index -1 = empty. Reverse-search on every update, no tweening.
+        var tokens = document.querySelectorAll("#f01-hook-slot [data-part='token']");
+        var SEQUENCE = [
+          { t: 0.0, i: -1 },
+          { t: 0.9, i: 0 }, // engagement bait.
+          { t: 1.6, i: 1 }, // AI filler.
+          { t: 2.3, i: 2 }, // humblebrags.
+          { t: 3.0, i: 3 }, // slop.
+        ];
+        function stateAt(time) {
+          for (var k = SEQUENCE.length - 1; k >= 0; k--) {
+            if (time >= SEQUENCE[k].t) return SEQUENCE[k].i;
+          }
+          return -1;
+        }
+        function render(time) {
+          var on = stateAt(time);
+          for (var k = 0; k < tokens.length; k++) {
+            tokens[k].style.visibility = k === on ? "visible" : "hidden";
+          }
+        }
+        var driver = { t: 0 };
+        tl.to(driver, { t: DURATION, duration: DURATION, ease: "none", onUpdate: function () { render(driver.t); } }, 0);
+        render(0);
+
+        // Scene 3 (3.0–4.0s): red underline draws left→right under "slop.", then hold.
+        tl.fromTo("#f01-hook-underline", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out" }, 3.06);
+
+        // Pin the timeline's total length to the frame duration.
+        tl.set({}, {}, DURATION);
+      })();
+    </script>
+  </div>
+</template>

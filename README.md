@@ -5,6 +5,10 @@
   </picture>
 </p>
 
+<p align="center">
+  <a href="assets/promo.mp4"><img src="assets/promo.gif" alt="Thirty-second promo: a LinkedIn feed graded as you scroll" width="720" /></a>
+</p>
+
 # Deslopify
 
 A Chrome/Firefox extension that reads every post in your LinkedIn feed, asks [TypeSafe's
@@ -167,10 +171,11 @@ src/
   content/     post discovery/extraction, rendering (shadow DOM badge + panel), content.css
   popup/       toolbar popup: live per-tab status, counters, quick toggles
   options/     provider, reader profile, tuning, rate limits, cache
-assets/        source logos (icon.png, wordmark.png) — everything else is derived with `npm run icons`
+assets/        source logos (icon.png, wordmark.png) + the promo video; derived files via `npm run icons` / `npm run promo`
 build.mjs      esbuild bundles per target + the Chrome/Firefox manifests
-scripts/       icon + wordmark derivation from assets/, store assets, site build
+scripts/       icon + wordmark derivation, promo render + gif, store assets, site build
 test/          unit, DOM (fixture in a real browser), e2e (real extension in Chromium)
+videos/        the HyperFrames source of the promo video (storyboard + frame compositions)
 ```
 
 Commands:

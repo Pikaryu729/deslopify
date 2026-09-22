@@ -1,0 +1,141 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #F2F4F7;
+    }
+    #root .clip {
+      position: absolute;
+      inset: 0;
+    }
+    [id="f07-cta-bg"] {
+      background: #0B0E13;
+    }
+    [id="f07-cta-glow"] {
+      position: absolute;
+      left: 50%;
+      top: 350px;
+      width: 1400px;
+      height: 700px;
+      margin-left: -700px;
+      margin-top: -350px;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(240, 180, 41, 0.12), rgba(240, 180, 41, 0));
+      filter: blur(40px);
+      will-change: opacity;
+    }
+    [id="f07-cta-stack"] {
+      position: absolute;
+      left: 0;
+      top: 192px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    [id="f07-cta-wordmark"] {
+      display: block;
+      width: 920px;
+      height: auto;
+      transform-origin: 50% 50%;
+      will-change: transform, opacity;
+    }
+    [id="f07-cta-pills"] {
+      position: relative;
+      width: 100%;
+      height: 56px;
+      margin-top: 56px;
+    }
+    [id="f07-cta-pills"] .pill {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      height: 56px;
+      padding: 0 34px;
+      display: flex;
+      align-items: center;
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      border-radius: 100px;
+      background: transparent;
+      color: #F2F4F7;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      will-change: transform, opacity;
+    }
+    [id="f07-cta-url"] {
+      margin-top: 48px;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      color: #F0B429;
+      white-space: nowrap;
+      will-change: clip-path, color;
+    }
+  </style>
+
+  <div id="root" data-composition-id="07-cta" data-width="1920" data-height="1080">
+    <div id="f07-cta-bg" class="clip" data-start="0" data-duration="5" data-track-index="0">
+      <div id="f07-cta-glow"></div>
+    </div>
+    <div id="f07-cta-content" class="clip" data-start="0" data-duration="5" data-track-index="1">
+      <div id="f07-cta-stack">
+        <img id="f07-cta-wordmark" src="assets/wordmark-dark.png" alt="" />
+        <div id="f07-cta-pills">
+          <div class="pill" data-target-x="-118">Chrome</div>
+          <div class="pill" data-target-x="118">Firefox</div>
+        </div>
+        <div id="f07-cta-url">pikaryu729.github.io/deslopify</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      var root = document.querySelector('[data-composition-id="07-cta"]');
+      var q = function (sel) { return root.querySelector(sel); };
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0–1.2s): wordmark settles (spring-pop, calm settle) + glow fades in.
+      tl.fromTo(q('[id="f07-cta-glow"]'), { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power2.out" }, 0);
+      tl.fromTo(
+        q('[id="f07-cta-wordmark"]'),
+        { scale: 0.92, y: 12, opacity: 0 },
+        { scale: 1, y: 0, opacity: 1, duration: 0.9, ease: "power3.out" },
+        0.1
+      );
+
+      // Scene 2 (1.2–2.6s): pills radiate from the shared centre (center-outward-expansion).
+      root.querySelectorAll('[id="f07-cta-pills"] .pill').forEach(function (el, i) {
+        tl.fromTo(
+          el,
+          { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 0.6, opacity: 0 },
+          { x: Number(el.dataset.targetX), y: 0, scale: 1, opacity: 1, duration: 1.1, ease: "power3.out" },
+          1.25 + i * 0.06
+        );
+      });
+
+      // Scene 3 (2.6–5.0s): URL wipes in left→right in gold, flips to white, then holds dead still (final frame).
+      var url = q('[id="f07-cta-url"]');
+      tl.fromTo(
+        url,
+        { clipPath: "inset(0 100% 0 0)", color: "#F0B429" },
+        { clipPath: "inset(0 0% 0 0)", duration: 0.55, ease: "power2.inOut" },
+        2.6
+      );
+      tl.to(url, { color: "#F2F4F7", duration: 0.25, ease: "power1.inOut" }, 3.15);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-cta"] = tl;
+    })();
+  </script>
+</template>

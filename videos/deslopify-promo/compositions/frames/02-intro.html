@@ -1,0 +1,100 @@
+<template>
+  <div id="root" data-composition-id="02-intro" data-duration="5" data-width="1920" data-height="1080">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .clip { position: absolute; inset: 0; }
+      [id="f02-intro-bg"] { background: #0B0E13; }
+
+      /* one shared centre for icon + wordmark: (960, 400) — rule-of-thirds upper band */
+      [id="f02-intro-glow"] {
+        position: absolute; left: 510px; top: -50px; width: 900px; height: 900px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #F0B429 0%, rgba(240,180,41,0.35) 40%, rgba(240,180,41,0) 70%);
+        filter: blur(60px);
+        opacity: 0;
+      }
+      [id="f02-intro-icon"] {
+        position: absolute; left: 841px; top: 281px; width: 238px; height: 238px;
+        transform-origin: 50% 50%; will-change: transform;
+      }
+      [id="f02-intro-wordmark"] {
+        position: absolute; left: 432px; top: 218px; width: 1056px; height: 364px;
+        transform-origin: 50% 50%; will-change: transform;
+      }
+      [id="f02-intro-tagline"] {
+        position: absolute; left: 0; right: 0; top: 622px;
+        text-align: center;
+        font-size: 2.2cqw; /* h3 role (600 / -0.02em / 1.3), lifted above the 1.4cqw floor for video */
+        font-weight: 600; letter-spacing: -0.02em; line-height: 1.3;
+        color: #9AA1AB;
+        white-space: nowrap;
+      }
+      /* ghost of the full phrase fixes the measure so the typed text never re-centres */
+      [id="f02-intro-tagline"] .wrap { display: inline-grid; text-align: left; }
+      [id="f02-intro-tagline"] .wrap > span { grid-area: 1 / 1; }
+      [id="f02-intro-tagline"] .ghost { visibility: hidden; }
+      [id="f02-intro-caret"] {
+        display: inline-block; width: 0.08em; height: 0.9em; margin-left: 0.08em;
+        vertical-align: -0.08em; background: #F0B429; opacity: 0;
+      }
+    </style>
+
+    <div id="f02-intro-bg" class="clip" data-start="0" data-duration="5" data-track-index="0"></div>
+
+    <div class="clip" data-start="0" data-duration="5" data-track-index="1">
+      <div id="f02-intro-glow"></div>
+      <img id="f02-intro-icon" src="assets/icon.png" alt="" />
+      <img id="f02-intro-wordmark" src="assets/wordmark-dark.png" alt="" />
+      <div id="f02-intro-tagline">
+        <span class="wrap"><span class="ghost">your feed, graded as you scroll.</span><span><span id="f02-intro-typed"></span><span id="f02-intro-caret"></span></span></span>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (() => {
+        const tl = gsap.timeline({ paused: true });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["02-intro"] = tl;
+
+        const $ = (s) => document.getElementById("f02-intro-" + s);
+        const glow = $("glow"), icon = $("icon"), wordmark = $("wordmark");
+        const typed = $("typed");
+        const caret = $("caret");
+
+        // Scene 1 (0.0–1.2): glow fades in, icon spring-pops whole (power3.out, no overshoot)
+        tl.fromTo(glow, { opacity: 0 }, { opacity: 0.10, duration: 1.1, ease: "power2.out" }, 0);
+        tl.fromTo(icon, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 0.1);
+
+        // Scene 2 (1.2–2.4): icon slides left onto the wordmark's own mark, shrinks + fades as the wordmark resolves
+        // (-343,-15) is the wordmark mark's centre relative to the shared centre; 1.07 matches its size.
+        tl.to(icon, { x: -343, y: -15, scale: 1.07, duration: 0.8, ease: "power3.inOut" }, 1.2);
+        tl.to(icon, { opacity: 0, duration: 0.4, ease: "power2.in" }, 1.7);
+        tl.fromTo(wordmark, { scale: 0.92, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 1.55);
+
+        // Scene 3 (2.4–4.5): tagline types on (smooth-slice), caret blinks twice, then holds still
+        const full = "your feed, graded as you scroll.";
+        const len = { v: 0 };
+        tl.set(caret, { opacity: 1 }, 2.4);
+        tl.to(len, {
+          v: full.length, duration: 1.15, ease: "power1.inOut",
+          onUpdate: () => { typed.textContent = full.substring(0, Math.floor(len.v)); },
+        }, 2.4);
+        // stepped blink: two off/on cycles, ending hidden
+        [3.75, 4.25].forEach((t) => {
+          tl.set(caret, { opacity: 0 }, t);
+          tl.set(caret, { opacity: 1 }, t + 0.25);
+        });
+        tl.set(caret, { opacity: 0 }, 4.45);
+        tl.set({}, {}, 4.5); // pin duration
+      })();
+    </script>
+  </div>
+</template>
