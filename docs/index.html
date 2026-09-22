@@ -71,7 +71,39 @@
             <source src="assets/promo.mp4" type="video/mp4" />
             <img src="assets/feed.png" alt="A LinkedIn feed with posts edged in gold, green, and red, each carrying a verdict badge" width="1184" height="656" />
           </video>
+          <button class="hero-video-open" type="button" aria-haspopup="dialog" aria-label="Watch the promo full size">
+            <span aria-hidden="true">⤢ Expand</span>
+          </button>
         </figure>
+
+        <dialog class="video-modal" aria-label="Deslopify promo">
+          <form method="dialog">
+            <button class="video-modal-close" aria-label="Close">✕</button>
+          </form>
+          <video controls muted playsinline preload="none" width="1280" height="720" src="assets/promo.mp4"></video>
+        </dialog>
+        <script>
+          // The modal plays the same file from where the hero is, and the hero waits while it is open.
+          (function () {
+            var hero = document.querySelector(".hero-video video");
+            var modal = document.querySelector(".video-modal");
+            var big = modal.querySelector("video");
+            document.querySelector(".hero-video-open").addEventListener("click", function () {
+              hero.pause();
+              modal.showModal();
+              big.currentTime = hero.currentTime;
+              big.play().catch(function () {});
+            });
+            modal.addEventListener("click", function (event) {
+              if (event.target === modal) modal.close(); // backdrop
+            });
+            modal.addEventListener("close", function () {
+              big.pause();
+              hero.currentTime = big.currentTime;
+              hero.play().catch(function () {});
+            });
+          })();
+        </script>
       </section>
 
       <section class="verdicts">
