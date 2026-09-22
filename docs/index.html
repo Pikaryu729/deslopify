@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deslopify — grade your LinkedIn feed as you scroll</title>
+    <meta
+      name="description"
+      content="Deslopify labels every post in your LinkedIn feed as a golden nugget, useful, or slop, using an AI model you configure with your own key."
+    />
+    <link rel="icon" href="assets/icon-128.png" />
+    <link rel="stylesheet" href="style.css" />
+    <meta property="og:title" content="Deslopify — grade your LinkedIn feed as you scroll" />
+    <meta property="og:description" content="Golden nuggets, useful posts, and slop — labelled as you scroll, with the reasoning shown." />
+    <meta property="og:image" content="assets/promo-tile-440x280.png" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <img src="assets/icon-128.png" alt="" width="28" height="28" />
+        <span>Deslopify</span>
+      </a>
+      <nav>
+        <a href="#how">How it works</a>
+        <a href="#install">Install</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/Pikaryu729/deslopify">Source</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>Your feed, graded as you scroll.</h1>
+          <p class="lede">
+            Deslopify reads each post in your LinkedIn feed and labels it — <strong>golden nugget</strong>,
+            <strong>useful</strong>, or <strong>slop</strong> — with the reasoning shown, not just a verdict.
+          </p>
+          <div class="chips">
+            <span class="chip chip--nugget">golden nugget</span>
+            <span class="chip chip--useful">useful</span>
+            <span class="chip chip--slop">slop</span>
+          </div>
+          <div class="cta">
+            <!-- When the store listings are live, point these at them:
+                 Chrome  → https://chromewebstore.google.com/detail/<id>
+                 Firefox → https://addons.mozilla.org/firefox/addon/deslopify/ -->
+            <a class="button" href="#install">Install it</a>
+            <a class="button button--ghost" href="https://github.com/Pikaryu729/deslopify">Read the source</a>
+          </div>
+          <p class="fineprint">
+            Free and open source. Runs on your own TypeSafe or Cloudflare key — no account, no analytics, no server of ours.
+          </p>
+        </div>
+        <div class="hero-shot">
+          <img
+            src="assets/screenshot-1-feed.png"
+            alt="A LinkedIn feed with posts outlined in gold, green and red, each carrying a verdict badge"
+            width="1280"
+            height="800"
+          />
+        </div>
+      </section>
+
+      <section id="how" class="section">
+        <h2>How it works</h2>
+        <div class="steps">
+          <article>
+            <h3>1 · Read</h3>
+            <p>
+              When a post scrolls into view, Deslopify takes its text, author, and whether it is promoted, suggested or a
+              repost. Nothing else on the page is read.
+            </p>
+          </article>
+          <article>
+            <h3>2 · Ask</h3>
+            <p>
+              It asks <a href="https://docs.typesafe.ai/">TypeSafe's jev</a> eleven structured questions in a single call:
+              one overall verdict, one information-density score, and nine yes/no signals.
+            </p>
+          </article>
+          <article>
+            <h3>3 · Decide in code</h3>
+            <p>
+              The answers become a verdict using weights and thresholds in the extension itself — not inside a prompt. Every
+              signal is visible, and every weight is yours to change.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--split">
+        <div>
+          <h2>It shows its work</h2>
+          <p>
+            Click any badge for the model's probability for each verdict, the signals that moved the score, the model that
+            answered, and what it cost in tokens. Low-confidence calls are marked instead of being hidden.
+          </p>
+          <p>
+            The verdicts are tuned to <em>you</em>: your interests, your definition of slop, your definition of a nugget.
+            That profile is sent with each request, so the labels reflect what you actually care about.
+          </p>
+        </div>
+        <img
+          src="assets/screenshot-2-explanation.png"
+          alt="The Deslopify explanation panel showing verdict probabilities, the signals that moved the score, and token usage"
+          width="1280"
+          height="800"
+        />
+      </section>
+
+      <section class="section section--split section--reverse">
+        <img
+          src="assets/screenshot-4-settings.png"
+          alt="Deslopify settings: provider and API key, reader profile, and verdict thresholds"
+          width="1280"
+          height="800"
+        />
+        <div>
+          <h2>Yours to tune</h2>
+          <ul class="ticks">
+            <li>Raise or lower the bar for a golden nugget.</li>
+            <li>Reweight how much promotion, engagement bait, or AI boilerplate counts against a post.</li>
+            <li>Collapse slop behind a "show post" stub, or just fade it.</li>
+            <li>Cap how many characters are sent per post, and how many requests per minute.</li>
+            <li>Point it at your own proxy endpoint instead of the default provider.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="install" class="section">
+        <h2>Install</h2>
+        <p class="fineprint">
+          Deslopify needs an API key from <a href="https://console.typesafe.ai/keys">TypeSafe</a> (or a Cloudflare Workers
+          AI token). You pay your provider directly for what you use — grading a feed is cheap, and verdicts are cached so
+          re-reading a feed costs nothing.
+        </p>
+        <div class="install-grid">
+          <article>
+            <h3>Chrome, Edge, Brave</h3>
+            <ol>
+              <li><code>npm install &amp;&amp; npm run build</code></li>
+              <li>Open <code>chrome://extensions</code> and turn on <em>Developer mode</em>.</li>
+              <li><em>Load unpacked</em> → the <code>dist/chrome</code> folder.</li>
+              <li>Open the popup → <em>Settings</em>, paste your key, press <em>Test connection</em>.</li>
+              <li>Reload your LinkedIn tab.</li>
+            </ol>
+          </article>
+          <article>
+            <h3>Firefox</h3>
+            <ol>
+              <li><code>npm install &amp;&amp; npm run build</code></li>
+              <li>Open <code>about:debugging#/runtime/this-firefox</code>.</li>
+              <li><em>Load Temporary Add-on…</em> → <code>dist/firefox/manifest.json</code>.</li>
+              <li>Add your key in settings, then reload your LinkedIn tab.</li>
+            </ol>
+            <p class="fineprint">
+              Firefox drops temporary add-ons when it quits; <code>npm run sign:firefox</code> produces a signed copy that
+              stays installed.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--privacy">
+        <h2>Privacy, in one breath</h2>
+        <p>
+          No accounts, no analytics, no Deslopify servers. The text of the post on your screen is sent only to the AI
+          provider <strong>you</strong> configured, with <strong>your</strong> key. Settings and cached verdicts stay in your
+          browser, and the cache can be cleared from the popup at any time.
+        </p>
+        <p><a class="button button--ghost" href="privacy.html">Read the full policy</a></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Deslopify is not affiliated with, endorsed by, or sponsored by LinkedIn Corporation or TypeSafe. LinkedIn is a
+        trademark of LinkedIn Corporation.
+      </p>
+      <p>
+        <a href="https://github.com/Pikaryu729/deslopify">Source</a> ·
+        <a href="https://github.com/Pikaryu729/deslopify/issues">Issues</a> ·
+        <a href="privacy.html">Privacy</a>
+      </p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deslopify — privacy policy</title>
+    <meta name="description" content="Privacy policy for the Deslopify browser extension." />
+    <link rel="icon" href="assets/icon-128.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="canonical" href="https://pikaryu729.github.io/deslopify/privacy.html" />
+  </head>
+  <body class="doc">
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <img src="assets/icon-128.png" alt="" width="28" height="28" />
+        <span>Deslopify</span>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="https://github.com/Pikaryu729/deslopify">Source</a>
+      </nav>
+    </header>
+    <main class="prose">
+      <h1 id="deslopify-privacy-policy">Deslopify privacy policy</h1>
+      <p><em>Last updated: 2026-09-22</em></p>
+      <p>Published at <a href="https://pikaryu729.github.io/deslopify/privacy.html">https://pikaryu729.github.io/deslopify/privacy.html</a> — this is the URL to give to the Chrome Web Store and addons.mozilla.org.</p>
+      <p>Deslopify is a browser extension that labels posts in your LinkedIn feed as a <strong>golden nugget</strong>, <strong>useful</strong>, or <strong>slop</strong>, using an AI model that you configure.</p>
+      <p>Short version: Deslopify has no servers, no analytics, and no accounts. The only data that leaves your browser is the text of a post, sent to the AI provider <strong>you</strong> chose and configured with <strong>your own</strong> API key.</p>
+      <h2 id="what-deslopify-reads">What Deslopify reads</h2>
+      <p>To score a post, Deslopify reads the post's content from the LinkedIn page you have open:</p>
+      <p>behind "see more".</p>
+      <ul><li>the post body text,</li><li>the author's display name and headline,</li><li>whether the post is promoted, suggested, a repost, contains media, contains an external link, or is collapsed</li></ul>
+      <p>It reads nothing else. It does not read your messages, connections, profile, search history, other tabs, or other websites. It does not run on any site other than <code>www.linkedin.com</code>.</p>
+      <h2 id="where-that-data-goes">Where that data goes</h2>
+      <p>When you scroll a post into view, Deslopify sends the fields above — together with the reader profile you typed into its settings (your interests, what you consider slop, what you consider a golden nugget) — to the AI provider you selected:</p>
+      <ul><li><strong>TypeSafe API</strong> (<code>api.typesafe.ai</code>) — default, using your TypeSafe API key, or</li><li><strong>Cloudflare Workers AI</strong> (<code>api.cloudflare.com</code>) — using your Cloudflare account ID and API token, or</li><li><strong>any endpoint URL you enter yourself</strong> in the extension's advanced settings.</li></ul>
+      <p>The provider returns a verdict, which Deslopify displays. That provider's own privacy policy governs what it does with the request. Deslopify sends nothing to the extension's author, and there is no Deslopify server involved.</p>
+      <h2 id="what-is-stored-and-where">What is stored, and where</h2>
+      <p>Everything below stays in your browser's extension storage on your device:</p>
+      <ul><li>your settings, including your API key (so the extension can call your provider),</li><li>a local cache of verdicts, keyed by a hash of the post and your settings, so re-scrolling does not re-send anything,</li><li>counters such as how many posts were scored and how many tokens were used.</li></ul>
+      <p>The cache holds verdicts and token counts, not copies of post text. You can clear it at any time from the popup or the settings page ("Clear cache"), and removing the extension deletes all of it.</p>
+      <h2 id="what-deslopify-does-not-do">What Deslopify does not do</h2>
+      <ul><li>No analytics, telemetry, crash reporting, or usage tracking.</li><li>No advertising, no ad identifiers, no profiling.</li><li>No selling or sharing of data with anyone other than the provider you configured.</li><li>No remote code: every line of JavaScript runs from the extension package you installed.</li></ul>
+      <h2 id="your-controls">Your controls</h2>
+      <ul><li><strong>Turn it off</strong> — the popup toggle stops all reading and all requests immediately.</li><li><strong>Point it somewhere else</strong> — the provider and endpoint are yours to change, including a proxy you run.</li><li><strong>Send less</strong> — cap the characters sent per post in settings.</li><li><strong>Delete everything</strong> — clear the cache, or uninstall the extension.</li></ul>
+      <h2 id="children">Children</h2>
+      <p>Deslopify is a tool for adults using LinkedIn and is not directed at children.</p>
+      <h2 id="changes">Changes</h2>
+      <p>Material changes to this policy will be published with a new "last updated" date in the extension's repository and, where required, noted in the extension's store listing.</p>
+      <h2 id="contact">Contact</h2>
+      <p>Questions, data requests, or complaints: open an issue at <a href="https://github.com/Pikaryu729/deslopify/issues">https://github.com/Pikaryu729/deslopify/issues</a> (add your email there if you would rather not use GitHub).</p>
+    </main>
+    <footer class="site-footer">
+      <p>
+        Deslopify is not affiliated with, endorsed by, or sponsored by LinkedIn Corporation or TypeSafe.
+        LinkedIn is a trademark of LinkedIn Corporation.
+      </p>
+      <p><a href="index.html">Home</a> · <a href="https://github.com/Pikaryu729/deslopify">Source</a></p>
+    </footer>
+  </body>
+</html>
