@@ -100,6 +100,12 @@ export function renderMarkdown(markdown) {
       list.items.push((bullet ?? numbered)[1]);
       continue;
     }
+    // Lazy continuation: a wrapped line inside a list item belongs to that item,
+    // not to a new paragraph (markdown's own rule, and source docs wrap at ~100 cols).
+    if (list) {
+      list.items[list.items.length - 1] += ` ${line.trim()}`;
+      continue;
+    }
     paragraph.push(line.trim());
   }
   flushParagraph();

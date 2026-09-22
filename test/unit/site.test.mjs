@@ -25,6 +25,22 @@ test("bullet and numbered lists become real lists", () => {
   assert.match(html, /<ol><li>first<\/li><li>second<\/li><\/ol>/);
 });
 
+test("a wrapped list item stays one item, in order", () => {
+  // Source documents wrap at ~100 columns; a continuation line must not be pulled
+  // out of its list and reordered above it.
+  const html = renderMarkdown(
+    "Reads:\n\n- the post body text,\n- whether the post is promoted, suggested, or a repost, and contains\n  an external link or is collapsed behind \"see more\".\n- the author.\n",
+  );
+  const list = html.match(/<ul>([\s\S]*?)<\/ul>/)[1];
+  assert.equal(list.match(/<li>/g).length, 3, "three items, not four");
+  assert.match(
+    list,
+    /<li>whether the post is promoted, suggested, or a repost, and contains an external link or is collapsed behind "see more"\.<\/li>/,
+  );
+  assert.equal(/<p>\s*an external link/.test(html), false, "the continuation is not its own paragraph");
+  assert.ok(html.indexOf("the post body text") < html.indexOf("the author"), "list order is preserved");
+});
+
 test("inline markup: bold, italic, code, links, autolinks", () => {
   assert.equal(inline("a **bold** word"), "a <strong>bold</strong> word");
   assert.equal(inline("_Last updated_"), "<em>Last updated</em>");
