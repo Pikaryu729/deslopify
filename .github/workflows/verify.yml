@@ -1,3 +1,6 @@
+# The one definition of "this commit is good": build, Mozilla lint, all three test
+# suites, and both store packages. Runs on every push and PR, and is called by
+# release.yml so a release can never test a different thing than a commit does.
 name: verify
 
 on:
@@ -5,11 +8,15 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -39,13 +46,17 @@ jobs:
       - name: End-to-end tests
         run: npm run test:e2e
 
-      # Prove the store packages still build, and keep them as a build artifact.
       - name: Package for both stores
         run: npm run package
+
+      # AMO wants readable source whenever a submission contains bundled or
+      # generated code. Ours is bundled by esbuild, so it travels with the release.
+      - name: Source archive for AMO reviewers
+        run: git archive --format=zip -o dist/artifacts/deslopify-source.zip HEAD
 
       - uses: actions/upload-artifact@v4
         with:
           name: store-packages
           path: dist/artifacts/*
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30

@@ -1,0 +1,183 @@
+# Publishes a new version to the Chrome Web Store and addons.mozilla.org.
+#
+# Trigger: push a version tag, or run it manually from the Actions tab to rehearse
+# without publishing.
+#
+#   npm version patch          # bumps package.json (and both manifests, at build)
+#   git push --follow-tags
+#
+# Store publishing is skipped, with a notice, until the required secrets exist — so
+# this workflow is green and harmless on a fresh fork or before setup.
+# One-time setup: store/RELEASING.md
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Actually upload and publish to the stores"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  # Same pipeline a normal push runs — no separate, quietly divergent test path.
+  verify:
+    uses: ./.github/workflows/verify.yml
+
+  github-release:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: store-packages
+          path: dist/artifacts
+
+      # `gh` is preinstalled, so this needs no third-party action and no token
+      # beyond the workflow's own.
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Deslopify $GITHUB_REF_NAME" \
+            --generate-notes \
+            dist/artifacts/deslopify-chrome-*.zip \
+            dist/artifacts/deslopify_feed_signal_filter-*.zip \
+            dist/artifacts/deslopify-source.zip \
+          || gh release upload "$GITHUB_REF_NAME" --clobber dist/artifacts/*.zip
+
+  chrome-web-store:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/') || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write # google-github-actions/auth
+    env:
+      # A service-account key JSON, linked to the Developer Dashboard account.
+      # A service account rather than user OAuth is deliberate: refresh tokens from
+      # a consent screen left in "Testing" expire after 7 days, which is the usual
+      # reason a store pipeline breaks a week after it is set up.
+      SA_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_KEY }}
+      PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+      EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: store-packages
+          path: dist/artifacts
+
+      - name: Say what is missing
+        if: env.SA_KEY == '' || env.PUBLISHER_ID == '' || env.EXTENSION_ID == ''
+        run: |
+          echo "::notice title=Chrome Web Store skipped::Set CHROME_SERVICE_ACCOUNT_KEY, CHROME_PUBLISHER_ID and CHROME_EXTENSION_ID to publish automatically. See store/RELEASING.md"
+
+      - uses: google-github-actions/auth@v2
+        if: env.SA_KEY != '' && env.PUBLISHER_ID != '' && env.EXTENSION_ID != ''
+        id: auth
+        with:
+          credentials_json: ${{ secrets.CHROME_SERVICE_ACCOUNT_KEY }}
+          token_format: access_token
+          scopes: https://www.googleapis.com/auth/chromewebstore
+
+      # https://developer.chrome.com/docs/webstore/using-api
+      # The v2 API is publisher-scoped, and the upload endpoint lives on a different
+      # host from the rest of it (upload/v2/... rather than v2/...).
+      - name: Upload the new package
+        if: steps.auth.outcome == 'success'
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          set -euo pipefail
+          zip=$(ls dist/artifacts/deslopify-chrome-*.zip | head -1)
+          echo "Uploading $zip"
+
+          response=$(curl -sS -X POST -T "$zip" \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://chromewebstore.googleapis.com/upload/v2/publishers/$PUBLISHER_ID/items/$EXTENSION_ID:upload")
+          echo "$response"
+          state=$(echo "$response" | jq -r '.uploadState // "UNKNOWN"')
+
+          # Big packages come back as UPLOAD_IN_PROGRESS; poll until it settles.
+          for _ in $(seq 1 20); do
+            [ "$state" != "UPLOAD_IN_PROGRESS" ] && break
+            sleep 5
+            state=$(curl -sS -H "Authorization: Bearer $TOKEN" \
+              "https://chromewebstore.googleapis.com/v2/publishers/$PUBLISHER_ID/items/$EXTENSION_ID:fetchStatus" \
+              | jq -r '.uploadState // "UNKNOWN"')
+            echo "upload state: $state"
+          done
+
+          if [ "$state" != "SUCCESS" ]; then
+            echo "::error::Upload did not succeed (state: $state). Is the version in package.json higher than the published one?"
+            exit 1
+          fi
+
+      - name: Submit for review
+        if: steps.auth.outcome == 'success'
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST -H "Authorization: Bearer $TOKEN" \
+            "https://chromewebstore.googleapis.com/v2/publishers/$PUBLISHER_ID/items/$EXTENSION_ID:publish" \
+            | jq -r '"submitted: " + (.state // "unknown")'
+          echo "::notice title=Chrome Web Store::Submitted. Review can take days; the listing updates when it passes."
+
+  firefox-amo:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/') || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      # "JWT issuer" / "JWT secret" from addons.mozilla.org → Manage API Keys.
+      AMO_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+      AMO_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: store-packages
+          path: dist/artifacts
+
+      - name: Say what is missing
+        if: env.AMO_KEY == '' || env.AMO_SECRET == ''
+        run: |
+          echo "::notice title=Firefox skipped::Set AMO_JWT_ISSUER and AMO_JWT_SECRET to submit automatically. See store/RELEASING.md"
+
+      # A listed submission is a review request, so don't hold the run open waiting
+      # for it: --approval-timeout 0 hands the version over and exits.
+      - name: Sign and submit
+        if: env.AMO_KEY != '' && env.AMO_SECRET != ''
+        run: |
+          npx web-ext sign \
+            --source-dir=dist/firefox \
+            --artifacts-dir=dist/artifacts \
+            --channel=listed \
+            --upload-source-code=dist/artifacts/deslopify-source.zip \
+            --approval-timeout=0 \
+            --api-key="$AMO_KEY" \
+            --api-secret="$AMO_SECRET"
+          echo "::notice title=Firefox::Version submitted to addons.mozilla.org for review."

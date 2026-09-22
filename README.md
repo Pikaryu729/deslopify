@@ -185,6 +185,13 @@ npm run store:assets   # 1280x800 screenshots + promo tiles for the listings
 Publishing is documented in [`store/PUBLISHING.md`](store/PUBLISHING.md): the exact click-path for both stores, the
 copy to paste into each form, permission justifications, data-disclosure answers, and the review risks worth knowing.
 
+Releasing an update is one command — [`store/RELEASING.md`](store/RELEASING.md) has the one-time credential setup:
+
+```bash
+npm run release:patch      # bumps the version, tags it, pushes; CI publishes to both stores
+npm run release:rehearse   # runs the same pipeline without publishing
+```
+
 ### What the tests actually cover
 
 The test suite runs the **real built extension** in Chromium, with `www.linkedin.com` intercepted and served from

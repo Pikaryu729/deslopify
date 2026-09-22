@@ -20,7 +20,10 @@
     "lint:firefox": "web-ext lint --source-dir=dist/firefox --output=text",
     "serve:mock": "node test/mock-typesafe-server.mjs",
     "shots": "node scripts/screenshot.mjs",
-    "verify": "npm run build && npm run lint:firefox && npm test"
+    "verify": "npm run build && npm run lint:firefox && npm test",
+    "release:patch": "npm version patch && git push --follow-tags",
+    "release:minor": "npm version minor && git push --follow-tags",
+    "release:rehearse": "gh workflow run release.yml"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
