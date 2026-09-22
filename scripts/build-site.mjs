@@ -4,11 +4,11 @@
  * What it does:
  *   1. renders PRIVACY.md into docs/privacy.html — the privacy policy the stores
  *      link to, generated so the policy text has exactly one source of truth;
- *   2. copies the listing screenshots into docs/assets/ so the site is self-contained
- *      (Pages only serves the /docs folder);
+ *   2. copies the product captures and icon into docs/assets/ so the site is
+ *      self-contained (Pages only serves the /docs folder);
  *   3. writes docs/.nojekyll so Pages serves the files as-is.
  *
- * docs/index.html and docs/style.css are hand-written source, not generated.
+ * docs/index.html, docs/style.css and docs/theme.js are hand-written source, not generated.
  *
  * Usage: node scripts/build-site.mjs
  */
@@ -124,18 +124,30 @@ export function policyDocument({ title, markdown, siteUrl }) {
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="Privacy policy for the Deslopify browser extension." />
     <link rel="icon" href="assets/icon-128.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+    />
     <link rel="stylesheet" href="style.css" />
+    <script src="theme.js"></script>
     <link rel="canonical" href="${siteUrl}privacy.html" />
   </head>
   <body class="doc">
     <header class="site-header">
       <a class="brand" href="index.html">
-        <img src="assets/wordmark-dark.png" alt="Deslopify" width="116" height="40" />
+        <img src="assets/icon-128.png" alt="" width="28" height="28" />
+        Deslopify
       </a>
       <nav>
         <a href="index.html">Home</a>
         <a href="privacy.html" aria-current="page">Privacy</a>
-        <a href="https://github.com/Pikaryu729/deslopify">Source</a>
+        <a href="https://github.com/Pikaryu729/deslopify">GitHub</a>
+        <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+        </button>
       </nav>
     </header>
     <main class="prose">
@@ -149,7 +161,10 @@ ${renderMarkdown(markdown)
         Deslopify is not affiliated with, endorsed by, or sponsored by LinkedIn Corporation or TypeSafe.
         LinkedIn is a trademark of LinkedIn Corporation.
       </p>
-      <p><a href="index.html">Home</a> · <a href="https://github.com/Pikaryu729/deslopify">Source</a></p>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="https://github.com/Pikaryu729/deslopify">Source</a>
+      </nav>
     </footer>
   </body>
 </html>
@@ -167,18 +182,16 @@ await writeFile(
 );
 await writeFile(resolve(docsDir, ".nojekyll"), "");
 
-const screenshots = [
-  "screenshot-1-feed.png",
-  "screenshot-2-explanation.png",
-  "screenshot-3-popup.png",
-  "screenshot-4-settings.png",
-  "promo-tile-440x280.png",
-  "icon-128.png",
-];
-for (const file of screenshots) {
-  await copyFile(resolve(root, "store/assets", file), resolve(assetsDir, file));
+const assets = {
+  "raw/feed.png": "feed.png",
+  "raw/panel.png": "panel.png",
+  "raw/options.png": "options.png",
+  "promo-tile-440x280.png": "promo-tile-440x280.png",
+  "icon-128.png": "icon-128.png",
+};
+for (const [from, to] of Object.entries(assets)) {
+  await copyFile(resolve(root, "store/assets", from), resolve(assetsDir, to));
 }
-await copyFile(resolve(root, "assets/wordmark-dark.png"), resolve(assetsDir, "wordmark-dark.png"));
 await copyFile(resolve(root, "assets/promo.mp4"), resolve(assetsDir, "promo.mp4"));
 
-console.log(`site built: docs/privacy.html (${policy.split("\n").length} lines of policy) + ${screenshots.length} assets`);
+console.log(`site built: docs/privacy.html (${policy.split("\n").length} lines of policy) + ${Object.keys(assets).length} assets`);

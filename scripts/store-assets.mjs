@@ -7,12 +7,13 @@
  * is the actual shipped UI inside a browser window, with a headline above it.
  *
  * Also writes the required 440x280 promo tile, the optional 1400x560 marquee, and
- * copies the 128x128 store icon.
+ * copies the 128x128 store icon. The uncaptioned captures go to store/assets/raw/
+ * for the website, which sets its own headings.
  *
  * Usage: node scripts/store-assets.mjs
  */
 import { chromium } from "playwright";
-import { copyFile, mkdir, mkdtemp, readFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -114,6 +115,9 @@ await feed.evaluate(() => {
 });
 await feed.waitForTimeout(350);
 const panelShot = await feed.screenshot();
+// The website shows the panel at column width, so it gets a tighter crop: the
+// panel plus enough of the graded posts to show what it is explaining.
+const panelClose = await feed.screenshot({ clip: { x: 150, y: 0, width: 880, height: WINDOW.height } });
 
 const extensionId = new URL(worker.url()).host;
 const popup = await context.newPage();
@@ -131,6 +135,13 @@ await options.evaluate(() => {
 });
 await options.waitForTimeout(400);
 const optionsShot = await options.screenshot();
+
+/* ------------------------------------------------------------ raw copies */
+
+await mkdir(resolve(outDir, "raw"), { recursive: true });
+for (const [name, buffer] of Object.entries({ feed: feedShot, panel: panelClose, popup: popupShot, options: optionsShot })) {
+  await writeFile(resolve(outDir, "raw", `${name}.png`), buffer);
+}
 
 /* ------------------------------------------------------- captioned frames */
 
