@@ -1,6 +1,6 @@
 {
   "name": "deslopify",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Browser extension that scores LinkedIn posts as golden nugget, useful, or slop with TypeSafe's jev model.",
   "type": "module",
