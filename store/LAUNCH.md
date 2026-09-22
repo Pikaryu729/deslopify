@@ -33,8 +33,9 @@ Two things I'll be honest about:
 
 2. It's a filter, not a judge. I've already disagreed with it more than once. The thresholds are yours.
 
-MIT, open source, Chrome and Firefox. It runs on your own API key, and there's demo mode that grades posts with a local
-heuristic so you can try it with no key and no sign-up — nothing leaves your browser in that mode.
+v1 is out today. MIT, open source, on the Chrome Web Store and Firefox Add-ons. It runs on your own API key, and demo
+mode grades posts with a local heuristic so you can try it with no key and no sign-up — nothing leaves your browser in
+that mode.
 
 Links in the first comment.
 ```
@@ -42,12 +43,14 @@ Links in the first comment.
 ## First comment
 
 ```text
-Code, install instructions, and the full write-up on how the verdicts are computed:
-https://github.com/Pikaryu729/deslopify
+Install (Chrome / Firefox) and a 40-second demo: https://pikaryu729.github.io/deslopify/
+Chrome Web Store: <link>  ·  Firefox Add-ons: <link>
+Code + how the verdicts are computed: https://github.com/Pikaryu729/deslopify
 
-There's a one-button demo mode (no API key, no account, no network requests) if you just want to see it work.
-Once the store listings clear review I'll add them here.
+No API key? There's a demo mode — one click, no account, nothing leaves your browser.
 ```
+
+Fill in both store links before posting; the post itself says "on the Chrome Web Store and Firefox Add-ons".
 
 ## Alternative short post (if the long one feels like too much)
 
@@ -70,9 +73,12 @@ Code: https://github.com/Pikaryu729/deslopify
 
 ## Media to attach
 
-Attach `store/assets/screenshot-1-feed.png` (the feed with gold/green/red edges) or, better, a 15–25 second screen
-recording of scrolling with badges appearing and one panel opening. A recording outperforms a still on LinkedIn, and
-the extension's whole point is motion.
+Attach `assets/promo.mp4` (42s, 720p, silent) as a native LinkedIn video — it autoplays muted, and every beat carries
+its own on-screen text. A recording outperforms a still on LinkedIn, and the extension's whole point is motion. Fall
+back to `store/assets/screenshot-1-feed.png` only if the upload fails.
+
+The demo beat is a real feed, so its post column is blurred: never post footage where a real person's name, face, or
+post sits next to a "slop" label.
 
 Alt text for the still:
 

@@ -5,9 +5,11 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 import { SITE_URL, inline, policyDocument, renderMarkdown } from "../../scripts/build-site.mjs";
 
@@ -79,6 +81,56 @@ test("the published policy page is not stale", async () => {
   const expected = policyDocument({ title: "Deslopify — privacy policy", markdown, siteUrl: SITE_URL });
   const published = await readFile(resolve(root, "docs/privacy.html"), "utf8");
   assert.equal(published, expected, "run `npm run build:site` after editing PRIVACY.md");
+});
+
+/** The files git tracks under docs/, or null when this is not a work tree (an npm tarball). */
+async function trackedDocsFiles() {
+  try {
+    const { stdout } = await promisify(execFile)("git", ["ls-files", "docs"], { cwd: root });
+    return new Set(stdout.split("\n").filter(Boolean));
+  } catch {
+    return null;
+  }
+}
+
+test("the landing page keeps the promo video in the hero", async () => {
+  const index = await readFile(resolve(root, "docs/index.html"), "utf8");
+  assert.match(index, /class="hero-video"[\s\S]*?assets\/promo\.mp4/, "the hero plays the rendered promo");
+});
+
+test("every file the landing page references ships with it", async () => {
+  // Pages serves docs/ straight out of the repository on main, so an asset that is on
+  // disk but untracked — or staged as deleted — is a 404 in production. The hero video
+  // went missing exactly that way: index.html still pointed at docs/assets/promo.mp4
+  // while the file sat staged for deletion.
+  const index = await readFile(resolve(root, "docs/index.html"), "utf8");
+  const refs = [...index.matchAll(/(?:src|href|poster)="([^"]*)"/g)]
+    .map((match) => match[1])
+    .filter((url) => url && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(url));
+  assert.ok(refs.length >= 6, `expected the page to reference files, saw ${refs.length}`);
+
+  const tracked = await trackedDocsFiles();
+  for (const ref of refs) {
+    await readFile(resolve(root, "docs", ref)).catch(() =>
+      assert.fail(`docs/index.html references ${ref}, but docs/${ref} does not exist`),
+    );
+    if (tracked) {
+      assert.ok(
+        tracked.has(`docs/${ref}`),
+        `docs/index.html references ${ref}, but it is not committed — Pages would serve a 404`,
+      );
+    }
+  }
+});
+
+test("the hero video on the site is the current promo render", async () => {
+  // `npm run promo` writes assets/promo.mp4; build:site copies it into docs/. Re-render
+  // without rebuilding and the landing page keeps playing the previous cut.
+  const [published, source] = await Promise.all([
+    readFile(resolve(root, "docs/assets/promo.mp4")),
+    readFile(resolve(root, "assets/promo.mp4")),
+  ]);
+  assert.ok(source.equals(published), "run `npm run build:site` after `npm run promo`");
 });
 
 test("the site has the pages the stores will be pointed at", async () => {

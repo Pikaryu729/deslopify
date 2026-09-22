@@ -92,9 +92,15 @@ banner and a Test connection button so you can confirm it works before you scrol
   `screenshot-4-settings.png` (all 1280×800, in that order)
 - **Small promo tile**: `store/assets/promo-tile-440x280.png`
 - **Marquee promo tile**: `store/assets/marquee-1400x560.png` (optional)
-- **Homepage / Support URL**: your repo or a page you control
+- **Homepage URL**: `https://pikaryu729.github.io/deslopify/`
+- **Support URL**: `https://github.com/Pikaryu729/deslopify/issues`
 
 ### 1.3 Privacy tab
+
+The Privacy tab asks for one justification per permission, and the dashboard labels each box itself — paste only the
+body text below, one box at a time. Note that Chrome lists `https://www.linkedin.com/*` as a host permission even
+though it lives under `content_scripts.matches` in the manifest rather than `host_permissions`; it still needs a
+justification.
 
 **Single purpose description** (paste):
 
@@ -103,28 +109,52 @@ Deslopify does one thing: it reads posts that appear in the user's LinkedIn feed
 nugget, useful, or slop, using an AI model the user configures with their own API key.
 ```
 
-**Permission justifications** (paste):
+**Permission `storage`** (paste):
 
 ```
-storage — Stores the user's own settings (their API key, thresholds, and reader profile) and a local cache of verdicts
-so that re-scrolling the feed does not re-send anything to the API. Nothing stored leaves the browser.
-
-Host permission https://www.linkedin.com/* — The extension's entire function is to read posts in the LinkedIn feed the
-user is viewing and draw a verdict badge on them. Without this it cannot see a post.
-
-Host permission https://api.typesafe.ai/* — Default AI provider. The extension posts the text of the post on screen to
-this endpoint using the API key the user supplied, and displays the returned verdict.
-
-Host permission https://api.cloudflare.com/* — Alternative AI provider the user may select instead of TypeSafe. Same
-purpose, same user-supplied credentials.
+Stores the user's own settings — their API key or Cloudflare token, thresholds, weights, and reader profile — and a
+local cache of verdicts, so that re-scrolling the feed does not re-send anything to the API. The cache holds the
+verdict and its token cost, keyed by a hash of the post, not a copy of the post text. Nothing leaves the browser
+except the user's own credentials, attached to the requests they make to the provider they configured.
 ```
+
+What is actually in extension storage, in case a reviewer asks: `deslopify:settings` (settings, including the API key),
+`deslopify:cache:<hash>` (one verdict per post), `deslopify:stats` (counters and token totals), and `deslopify:tabs`
+(per-tab progress). No `unlimitedStorage`, no `storage.sync`, no server.
+
+**Host permission `https://www.linkedin.com/*`** (paste):
+
+```
+The extension's entire function is to read posts in the LinkedIn feed the user is viewing and draw a verdict badge on
+them. Without this it cannot see a post, and it runs on no other site.
+```
+
+**Host permission `https://api.typesafe.ai/*`** (paste):
+
+```
+Default AI provider. When the user scrolls a post into view, the extension sends that post's text, its author name and
+headline, and the reader profile from its own settings to this endpoint, using the API key the user supplied, and
+displays the verdict it returns.
+```
+
+**Host permission `https://api.cloudflare.com/*`** (paste):
+
+```
+Alternative AI provider the user may select instead of TypeSafe, using their own Cloudflare account ID and API token.
+Same request and same purpose as above.
+```
+
+_If a reviewer pushes back on a required host permission for an optional second provider, demote it: move
+`https://api.cloudflare.com/*` to `optional_host_permissions` and request it from the options page when the user saves
+Cloudflare credentials._
 
 **Remote code**: select **"No, I am not using remote code."** All JavaScript ships in the package; the extension only
 fetches JSON verdicts.
 
-**Data usage**: check **Website content** (the text of the post being graded is transmitted). The user's own
-personally identifying information, health, financial, authentication, communications, location, web history, and user
-activity are *not* collected. Then certify the limited-use statements.
+**Data usage**: check **Website content** and nothing else — the post text, its author name and headline, and the
+reader profile are transmitted to the provider the user configured. The user's own personally identifying information,
+health, financial, authentication, communications, location, web history, and user activity are *not* collected. Then
+certify the limited-use statements.
 
 **Privacy policy URL**: `https://pikaryu729.github.io/deslopify/privacy.html`.
 
@@ -228,7 +258,7 @@ its meaning between updates — so ship behaviour changes as a version bump, nev
   walk the feed in the background.
 - **"Single purpose" narrowness.** Do not add unrelated features (a general AI sidebar, a messaging tool) to the same
   extension; Chrome rejects those. New capability = new extension.
-- **Reviewers cannot test without credentials.** See §0.2 — this is the most likely cause of a "not functional"
+- **Reviewers cannot test without credentials.** See §1.5 — this is the most likely cause of a "not functional"
   rejection, and it has a one-line fix.
 - **Cost transparency.** Users pay their own provider. Say so plainly in the listing (the draft above does), or reviews
   will punish you for it.
