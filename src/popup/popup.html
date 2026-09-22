@@ -19,8 +19,22 @@
     <div style="padding: 12px">
       <div id="no-key" class="card" hidden>
         <strong>No API key yet.</strong>
-        <p class="hint">Add your TypeSafe key and Deslopify starts scoring posts as you scroll.</p>
-        <button class="primary" id="open-options-key" style="margin-top: 8px">Set up Deslopify</button>
+        <p class="hint">
+          Add your TypeSafe key for real grading, or try demo mode first — it grades posts with a local heuristic, no key
+          and no network.
+        </p>
+        <div class="row" style="margin-top: 8px">
+          <button class="primary" id="try-demo">Try demo mode</button>
+          <button id="open-options-key">Set up a key</button>
+        </div>
+      </div>
+
+      <div id="demo-note" class="card" hidden>
+        <strong>Demo mode is on.</strong>
+        <p class="hint">
+          Verdicts come from a local heuristic, not an AI model, and nothing leaves this browser. Add a key in settings to
+          switch to real grading.
+        </p>
       </div>
 
       <div class="stats">
@@ -45,6 +59,9 @@
       <label class="switch"><input type="checkbox" data-setting="showBadges" /> Show verdict badges</label>
       <label class="switch"><input type="checkbox" data-setting="dimSlop" /> Fade slop posts</label>
       <label class="switch"><input type="checkbox" data-setting="hideSlop" /> Collapse slop posts</label>
+      <label class="switch" title="Grade with a local heuristic: no API key, no network">
+        <input type="checkbox" data-setting="demoMode" id="demo-mode" /> Demo mode (no API key)
+      </label>
 
       <div class="legend" style="margin-top: 10px">
         <span class="dot" style="background: var(--nugget)"></span> golden nugget

@@ -10,6 +10,7 @@ import {
 } from "../shared/settings.js";
 import { buildQuestions, buildState } from "../shared/rubric.js";
 import { computeVerdict } from "../shared/verdict.js";
+import { demoAnswers } from "../shared/demo.js";
 import { callJev } from "./api.js";
 import {
   cacheDelete,
@@ -182,6 +183,18 @@ async function classify(post, { force = false } = {}) {
 
   const run = queue.add(async () => {
     const live = await getSettings();
+
+    // Demo mode: same rubric, same verdict math, no network at all.
+    if (live.demoMode) {
+      const answers = demoAnswers(post, live);
+      const result = computeVerdict(answers, live, {
+        model: "demo (local heuristic — no model, no network)",
+        usage: null,
+      });
+      result.demo = true;
+      return result;
+    }
+
     const state = buildState(post, live);
     const questions = buildQuestions(live);
     const { answers, usage, model } = await callJev(live, { state, questions });
@@ -207,6 +220,9 @@ async function classify(post, { force = false } = {}) {
 /** Cheap round-trip that proves the key/endpoint work and reports the live model. */
 async function testConnection() {
   const current = await getSettings();
+  if (current.demoMode) {
+    return { model: "demo (local heuristic — no model, no network)", demo: true, latencyMs: 0, usage: null, provider: "demo" };
+  }
   const started = Date.now();
   const { answers, model, usage } = await callJev(
     current,
@@ -282,6 +298,16 @@ async function handle(message) {
 
     case MSG.RELOAD_SETTINGS:
       return ok({ settings: await refreshSettings() });
+
+    case MSG.PATCH_SETTINGS: {
+      const updated = await patchSettings(message.patch ?? {});
+      settings = updated;
+      queue.setLimits({ concurrency: updated.concurrency, requestsPerMinute: updated.requestsPerMinute });
+      // Verdicts cached under the old settings would be stale (illustrated by the
+      // cache key including the settings fingerprint), so drop them on a switch.
+      if (message.clearCache) await clearCache();
+      return ok({ settings: updated });
+    }
 
     case MSG.GET_STATS: {
       const s = await loadStats();

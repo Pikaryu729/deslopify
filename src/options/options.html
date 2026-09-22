@@ -15,6 +15,14 @@
 
     <main style="padding: 0 14px">
       <h2>Model access</h2>
+      <label class="switch" title="Grade with a local heuristic: no API key, no network">
+        <input type="checkbox" data-setting="demoMode" /> Demo mode — grade with a local heuristic, require no key
+      </label>
+      <p class="hint">
+        Demo mode makes no network requests at all: it labels posts with a small local classifier so you can see how the
+        extension behaves before signing up anywhere. Verdicts are marked "demo" everywhere they appear. Turn it off and
+        add a key below for real grading.
+      </p>
       <label class="field">
         <span>Provider</span>
         <select data-setting="provider">

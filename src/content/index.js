@@ -1,6 +1,6 @@
 import ext from "../shared/webext.js";
 import { MSG } from "../shared/messages.js";
-import { getSettingsCached } from "../shared/settings.js";
+import { getSettingsCached, configProblem } from "../shared/settings.js";
 import { digest } from "../shared/hash.js";
 import { extractPost, findPosts, diagnose } from "./posts.js";
 import {
@@ -124,12 +124,12 @@ function scan(reextract = true) {
 
     const contentDigest = digest(post.digestText);
     const previous = records.get(container);
-    if (previous && previous.digest === contentDigest && previous.status !== "error") {
+    if (previous?.digest === contentDigest && !isDueForRetry(previous)) {
       previous.post = post;
       continue;
     }
     if (previous?.timer) clearTimeout(previous.timer);
-    records.set(container, { status: "idle", container, post, digest: contentDigest, attempts: 0 });
+    records.set(container, { status: "idle", container, post, digest: contentDigest, attempts: previous?.attempts ?? 0 });
     visibilityObserver.observe(container);
 
     // Prefetch posts that are already on screen when the extension loads.
@@ -144,6 +144,7 @@ function scan(reextract = true) {
 async function enqueue(record) {
   if (!record || record.status !== "idle") return;
   record.status = "pending";
+  record.attempted = true;
   markPending(record.container, settings);
 
   try {
@@ -157,11 +158,21 @@ async function enqueue(record) {
   } catch (error) {
     record.status = "error";
     record.error = error;
+    record.attempts = (record.attempts ?? 0) + 1;
 
     if (error?.code === "config") {
       record.status = "idle";
       record.container.classList.remove("deslopify-pending");
-      showBanner(error.message);
+      // The user may have fixed the configuration while this request was in flight
+      // (the classic "click Try demo mode, or paste a key" moment). Check before
+      // saying anything: telling them about a problem they just solved — and
+      // overwriting the banner that says demo mode is on — is both wrong and rude.
+      const current = await getSettingsCached();
+      if (configProblem(current)) {
+        showBanner(error.message);
+      } else {
+        record.timer = setTimeout(() => enqueue(record), 150);
+      }
       return;
     }
 
@@ -172,14 +183,50 @@ async function enqueue(record) {
     });
 
     const retryable = !["auth", "bad_request", "bad_response", "unknown_message"].includes(error?.code);
-    if (retryable && (record.attempts ?? 0) < MAX_AUTO_RETRIES) {
-      record.attempts = (record.attempts ?? 0) + 1;
+    if (retryable && record.attempts <= MAX_AUTO_RETRIES) {
       record.status = "idle";
       const delay = 3_000 * 2 ** (record.attempts - 1);
       record.timer = setTimeout(() => enqueue(record), delay);
       markPending(record.container, settings);
       record.container.classList.add("deslopify-error");
     }
+  }
+}
+
+/**
+ * Should a scanned post be graded again?
+ *
+ * Yes when it was attempted and never got a verdict (a missing key, a rejected
+ * key, a network failure) — including after the user fixes the problem, which is
+ * what makes "switch on demo mode" or "paste a key" take effect immediately.
+ * No for posts we have not tried yet (they are graded when they scroll into view,
+ * which keeps a settings change from spending money on off-screen posts), no once
+ * a post is settled, and no after too many failures per post. `retryUnscored()`
+ * resets the counter.
+ */
+function isDueForRetry(record) {
+  if (!record.attempted) return false;
+  if (record.status === "done" || record.status === "pending" || record.status === "skipped") return false;
+  return (record.attempts ?? 0) < MAX_AUTO_RETRIES;
+}
+
+/**
+ * Re-attempt every post that has been attempted and still has no verdict, when
+ * settings change — a pasted key, a new endpoint, or demo mode being switched on.
+ *
+ * This deliberately ignores the give-up counter: that counter exists to stop
+ * mutation-driven rescans hammering a broken config, and an explicit user change
+ * is exactly the signal that says "try again". Posts that were never attempted are
+ * left alone so they are graded when they scroll into view, not paid for in bulk.
+ */
+function retryUnscored() {
+  for (const record of records.values()) {
+    if (!record.attempted) continue;
+    if (record.result || record.status === "pending" || record.status === "skipped") continue;
+    if (record.timer) clearTimeout(record.timer);
+    record.attempts = 0;
+    record.status = "idle";
+    record.timer = setTimeout(() => enqueue(record), 150);
   }
 }
 
@@ -316,14 +363,57 @@ function openOptions() {
   ext.runtime.sendMessage({ type: MSG.OPEN_OPTIONS }).catch(() => {});
 }
 
-/** Ask the background where the user stands: credentials, endpoint, model. */
-async function configProblem() {
+/** Switch demo mode on/off from the page banner. */
+async function setDemoMode(demoMode) {
+  const button = bannerEl?.querySelector(".deslopify-banner-button");
+  if (button) button.textContent = "Turning on…";
+  // Clear the banner *before* the write: the settings listener renders the new
+  // state when it arrives, and a late hide() here would wipe what it drew.
+  hideBanner();
   try {
-    const response = await ext.runtime.sendMessage({ type: MSG.GET_CONFIG });
-    return response?.ok ? response.config.problem : null;
+    await ext.runtime.sendMessage({ type: MSG.PATCH_SETTINGS, patch: { demoMode }, clearCache: true });
   } catch {
-    return "Deslopify's background worker is not responding — reload the extension";
+    showBanner("Could not switch demo mode — open settings and toggle it there.", {
+      actions: [{ label: "Open settings", onClick: openOptions }],
+    });
   }
+}
+
+/**
+ * Render whatever banner the current settings call for. Single source of truth for
+ * page-level messaging, so no two paths can fight over the banner.
+ */
+function refreshBanner() {
+  hideBanner();
+  if (!settings?.enabled) return;
+  if (settings.demoMode) {
+    showDemoBanner();
+    return;
+  }
+  const problem = configProblem(settings);
+  if (problem) {
+    showBanner(problem, {
+      actions: [
+        { label: "Try demo mode (no key)", onClick: () => setDemoMode(true) },
+        { label: "Open settings", onClick: openOptions },
+        { label: COPY_LABEL.idle, onClick: (button) => copyDiagnostics(button) },
+      ],
+    });
+  }
+}
+
+/** Demo mode is on: say so, so a heuristic verdict is never mistaken for a model's. */
+function showDemoBanner() {
+  showBanner(
+    "Demo mode is on: verdicts come from a local heuristic, not an AI model. Add an API key in settings for real grading.",
+    {
+      tone: "info",
+      actions: [
+        { label: "Open settings", onClick: openOptions },
+        { label: "Keep demo", onClick: hideBanner },
+      ],
+    },
+  );
 }
 
 /** Copy the DOM diagnostics to the clipboard, falling back to the console. */
@@ -439,16 +529,7 @@ async function start() {
   if (settings.enabled) enable();
   warnIfNoPostsMatched();
   registerTab();
-
-  const problem = await configProblem();
-  if (problem) {
-    showBanner(problem, {
-      actions: [
-        { label: "Open settings", onClick: openOptions },
-        { label: COPY_LABEL.idle, onClick: (button) => copyDiagnostics(button) },
-      ],
-    });
-  }
+  refreshBanner();
 }
 
 /** Tell the background worker this tab exists, so the popup can inspect it. */
@@ -482,9 +563,10 @@ ext.storage.onChanged?.addListener(async (changes, area) => {
   }
   if (!wasEnabled) enable();
   else {
-    hideBanner();
     repaintAll();
     scheduleScan();
+    retryUnscored(); // a fixed key, or demo mode, must take effect without scrolling
+    refreshBanner();
   }
 });
 

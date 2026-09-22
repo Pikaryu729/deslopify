@@ -361,6 +361,12 @@ test("a rejected API key surfaces a retry badge instead of a wrong verdict", asy
     [URN.nugget],
   );
   assert.equal(verdict, null, "no verdict is shown when the call failed");
+
+  // Fixing the key must take effect where the user is standing: no reload, no
+  // scrolling the post out of view and back.
+  server.setScenario("ok");
+  await writeSettings({});
+  await waitForVerdict(URN.nugget, "golden_nugget", 20_000);
   server.setScenario("ok");
 });
 
@@ -405,6 +411,65 @@ test("fading slop leaves the badge crisp", async () => {
   assert.ok(styles.badgeZ > 5, `badge sits above the tint (z-index ${styles.badgeZ})`);
   assert.equal(styles.badgeOpacity, "1", "the badge itself is not faded");
   await writeSettings({ dimSlop: false });
+});
+
+test("a reviewer with no API key can click one button and see it work", async () => {
+  // The store-review path: no credentials, no dashboard, one click on the page.
+  await writeSettings({ apiKey: "", demoMode: false });
+  await clearCache();
+  const before = server.requests.length;
+  await page.goto("https://www.linkedin.com/feed/");
+
+  const banner = page.locator(".deslopify-banner");
+  await banner.waitFor({ timeout: 20_000 });
+  assert.match(await banner.innerText(), /TypeSafe API key/i);
+  await banner.getByRole("button", { name: /try demo mode/i }).click();
+
+  // The posts already on screen must grade immediately (no scroll needed): that is
+  // the difference between a reviewer seeing it work and seeing nothing.
+  await page.waitForFunction(() => document.querySelectorAll("[data-deslopify]").length >= 1, undefined, { timeout: 15_000 });
+  await scrollWholeFeed();
+  await page.waitForFunction(() => document.querySelectorAll("[data-deslopify]").length >= 5, undefined, { timeout: 30_000 });
+  await waitForRequestSettle();
+
+  // Demo mode is a promise about the network: nothing may be sent.
+  assert.equal(server.requests.length, before, "demo mode must not call any API");
+
+  const verdicts = await page.evaluate(() =>
+    [...document.querySelectorAll("[data-deslopify]")].map((node) => node.dataset.deslopify),
+  );
+  assert.equal(verdicts.length, 5);
+  assert.equal(new Set(verdicts).size, 3, "the demo classifier produces all three verdicts on this fixture");
+
+  // And it must be labelled as a demo wherever a verdict is explained.
+  await page.locator(`[data-urn="${URN.slop}"] .deslopify-badge-host .pill`).click();
+  const panel = page.locator(".deslopify-panel-host .panel");
+  await panel.waitFor({ timeout: 5_000 });
+  assert.match(await panel.innerText(), /Slop \(demo\)/);
+  assert.match(await panel.innerText(), /demo mode — local heuristic/);
+  await page.keyboard.press("Escape");
+
+  const demoBanner = await page.locator(".deslopify-banner").innerText();
+  assert.match(demoBanner, /local heuristic, not an AI model/i, "the page says demo mode is on");
+});
+
+test("the popup offers demo mode and reports it honestly", async () => {
+  await writeSettings({ apiKey: "", demoMode: false });
+  const extensionId = new URL(serviceWorker.url()).host;
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await popup.locator("#no-key").waitFor({ timeout: 10_000 });
+
+  await popup.locator("#try-demo").click();
+  await popup.locator("#demo-note").waitFor({ timeout: 10_000 });
+  const note = await popup.locator("#demo-note").innerText();
+  assert.match(note, /not an AI model/i);
+  assert.equal(await popup.locator("#no-key").isVisible(), false, "the key prompt goes away");
+
+  const stored = await waitForSetting("demoMode", (settings) => settings.demoMode === true);
+  assert.equal(stored.demoMode, true);
+  await popup.close();
+  await writeSettings({ demoMode: false });
 });
 
 test("the settings page saves changes to storage", async () => {

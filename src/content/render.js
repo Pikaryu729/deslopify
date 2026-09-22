@@ -8,6 +8,9 @@ const VERDICT_TITLES = {
   slop: "Slop",
 };
 
+/** Demo verdicts must never read as if a model produced them. */
+const verdictLabel = (result) => `${VERDICT_TITLES[result.verdict]}${result.demo ? " (demo)" : ""}`;
+
 /* --------------------------------------------------------------- helpers */
 
 function el(tag, props = {}, children = []) {
@@ -102,7 +105,7 @@ function badgeContent(result, settings) {
   return el("button", {
     class: `pill${result.uncertain ? " uncertain" : ""}`,
     type: "button",
-    "aria-label": `Deslopify: ${VERDICT_TITLES[result.verdict]} (${pct(result.confidence)} confidence). Open details.`,
+    "aria-label": `Deslopify: ${verdictLabel(result)} (${pct(result.confidence)} confidence). Open details.`,
     style: { "--tint": color, "--soft": soft, "--ink": "#16181d" },
   }, [
     el("span", { class: "dot" }),
@@ -118,7 +121,7 @@ export function applyVerdict(container, result, settings, handlers = {}) {
   container.classList.remove("deslopify-pending", "deslopify-error", "deslopify-skipped");
   container.classList.toggle("deslopify-uncertain", Boolean(result.uncertain));
   container.classList.toggle("deslopify-dim", Boolean(settings.dimSlop && result.verdict === "slop"));
-  container.title = `Deslopify: ${VERDICT_TITLES[result.verdict]} — ${summarise(result)}`;
+  container.title = `Deslopify: ${verdictLabel(result)} — ${summarise(result)}`;
 
   removeBadge(container);
   if (!settings.showBadges) return;
@@ -257,6 +260,7 @@ export function openPanel(anchor, result, meta = {}) {
   );
 
   const chips = el("div", { class: "chips" }, [
+    result.demo ? el("span", { class: "chip", text: "demo mode — local heuristic" }) : null,
     result.uncertain ? el("span", { class: "chip", text: "low confidence" }) : null,
     result.offTopic ? el("span", { class: "chip", text: "off-topic for you" }) : null,
     result.overridden ? el("span", { class: "chip", text: `rule: ${result.overridden}` }) : null,
@@ -268,7 +272,7 @@ export function openPanel(anchor, result, meta = {}) {
   const panel = el("div", { class: "panel", role: "dialog", "aria-label": "Deslopify verdict details", style: { "--tint": color } }, [
     el("header", {}, [
       el("span", { class: "dot" }),
-      el("h2", { text: VERDICT_TITLES[result.verdict] }),
+      el("h2", { text: verdictLabel(result) }),
       el("span", { class: "score", text: `${result.score > 0 ? "+" : ""}${result.score.toFixed(2)}` }),
     ]),
     el("div", { class: "muted", text: `${summarise(result)} · confidence ${pct(result.confidence)}` }),

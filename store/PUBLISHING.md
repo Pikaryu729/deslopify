@@ -18,6 +18,8 @@ plus the exact text to paste into each form.
 | Store icon (128×128) | `store/assets/icon-128.png` |
 | Privacy policy | **live** at <https://pikaryu729.github.io/deslopify/privacy.html> (generated from `PRIVACY.md` by `npm run build:site`) |
 | Version | `package.json` only; `build.mjs` injects it into both manifests |
+| License | MIT (`LICENSE`) |
+| Reviewer path | demo mode: no key, no account, no network — see §1.5 |
 
 The privacy policy URL to give both stores is:
 
@@ -32,13 +34,10 @@ swap in an email address there if you prefer.
 You still need a **Chrome Web Store developer account** (one-time US$5, 2FA required) and a **Mozilla account** for AMO
 (free).
 
-One thing to decide before submitting:
-
-**The extension needs the user's own API key to do anything.** A reviewer without a key sees the "Deslopify needs a
-   TypeSafe API key" banner, and "requires an account/credentials I don't have" is a common rejection. Two options:
-   - paste a **temporary TypeSafe key** into the Chrome *Test instructions* field (the cleanest fix), or
-   - let me add a **demo mode** that returns canned verdicts without any API call, which doubles as a "try before you
-     sign up" path for users. Say the word.
+**Demo mode already solves the reviewer problem.** A reviewer with no credentials sees one button — *Try demo mode* —
+on the LinkedIn page and in the popup. One click grades posts locally: no key, no account, and no network requests at
+all. Every verdict it produces is labelled "demo" in the verdict title, the explanation panel, and the popup, so a
+reviewer cannot mistake it for the paid path. The test instructions in §1.5 lead with that.
 
 ---
 
@@ -136,16 +135,24 @@ activity are *not* collected. Then certify the limited-use statements.
 ### 1.5 Test instructions
 
 ```
-No account is needed. To see it work:
+No account, no credentials, and no configuration are needed to test this extension.
 
-1. Install the extension and open its settings (toolbar icon → Settings).
-2. Paste a TypeSafe API key into "TypeSafe API key" (a temporary key for review is provided above), then click
-   "Test connection" — it should report the model and latency.
-3. Open https://www.linkedin.com/feed/ and scroll. Posts get a coloured edge and a badge; click a badge for the full
-   explanation.
+1. Install it, then open https://www.linkedin.com/feed/ and log in (any account).
+2. A banner appears saying a TypeSafe API key is required, with a button: "Try demo mode (no key)". Click it.
+   (The same button is in the toolbar popup.)
+3. Posts on screen are graded within a second, and the rest grade as you scroll. Each post gets a coloured left edge
+   and a badge in the author row: gold = golden nugget, green = useful, red = slop.
+4. Click a badge to open the explanation panel: the probability for each verdict, the signals that moved the score
+   (originality, specificity, actionable, promotional, engagement bait, AI boilerplate, broetry, relevance, worth
+   saving), the model name, and the token cost. In demo mode the panel and the verdict title are labelled "(demo)".
+5. Settings (toolbar icon → Settings) shows every threshold and weight; the popup shows a per-tab status line and a
+   Diagnostics button.
 
-Without an API key the extension intentionally shows a banner explaining that a key is required, and draws nothing on
-posts. All processing is local except the single request per post to the configured provider.
+Demo mode is a local heuristic and makes NO network requests: with it on, the extension can be fully exercised
+offline. To exercise the real model path, paste a TypeSafe API key (console.typesafe.ai) into Settings and press
+"Test connection"; that path sends one request per post to the configured provider and nothing else.
+
+Everything else the extension does is local: settings, the verdict cache, and counters live in extension storage.
 ```
 
 ### 1.6 Submit

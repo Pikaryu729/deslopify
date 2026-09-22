@@ -11,6 +11,7 @@ export function cacheKeyFor(post, settings) {
     rubric: RUBRIC_VERSION,
     verdict: VERDICT_VERSION,
     provider: settings.provider,
+    demo: Boolean(settings.demoMode),
     model: settings.provider === "cloudflare" ? settings.cloudflareModel : settings.model,
     endpoint: settings.provider === "cloudflare" ? settings.cloudflareAccountId : settings.baseUrl,
     profile: {

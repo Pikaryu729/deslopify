@@ -12,6 +12,7 @@ export const MSG = {
   REGISTER_TAB: "tabs:register",
   GET_PAGE_STATUS: "tabs:pageStatus",
   GET_CONFIG: "config:get",
+  PATCH_SETTINGS: "settings:patch",
   DIAGNOSE: "diagnostics:collect",
   PING: "ping",
 };

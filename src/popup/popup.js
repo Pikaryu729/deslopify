@@ -90,19 +90,37 @@ async function copyDiagnostics() {
   }
 }
 
+/** Show either "you need a key" or "demo mode is on", never neither. */
+function renderKeyState() {
+  const hasKey =
+    settings.provider === "cloudflare" ? Boolean(settings.cloudflareApiToken) : Boolean(settings.apiKey);
+  $("no-key").hidden = hasKey || settings.demoMode;
+  $("demo-note").hidden = !settings.demoMode;
+}
+
 async function init() {
   settings = await getSettingsCached();
   applyToForm(document, settings);
-  $("no-key").hidden = settings.provider === "typesafe" ? Boolean(settings.apiKey) : Boolean(settings.cloudflareApiToken);
+  renderKeyState();
 
   $("enabled").addEventListener("change", (event) => {
     status(event.target.checked ? "Highlighting on" : "Highlighting off");
+  });
+
+  $("try-demo").addEventListener("click", async () => {
+    await ext.runtime.sendMessage({ type: MSG.PATCH_SETTINGS, patch: { demoMode: true }, clearCache: true });
+    settings = await getSettingsCached();
+    applyToForm(document, settings);
+    renderKeyState();
+    await renderPageStatus();
+    status("Demo mode on — scroll your feed", "ok");
   });
 
   onFormChange(document, (patch) => {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
       settings = await patchSettings(patch);
+      renderKeyState();
       status("Saved");
       setTimeout(() => status(""), 1200);
     }, 250);

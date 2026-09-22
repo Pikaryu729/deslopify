@@ -18,6 +18,9 @@ export const VERDICT_META = {
 export const DEFAULT_SETTINGS = {
   enabled: true,
 
+  // Score posts locally with the demo classifier: no API key, no network requests.
+  demoMode: false,
+
   // --- provider ---------------------------------------------------------
   provider: "typesafe", // "typesafe" | "cloudflare"
   apiKey: "",
@@ -67,6 +70,7 @@ export const DEFAULT_SETTINGS = {
 
 /** Why Deslopify cannot work right now, in words a user can act on. */
 export function configProblem(settings) {
+  if (settings.demoMode) return null; // demo mode needs nothing
   if (settings.provider === "cloudflare") {
     if (!settings.cloudflareAccountId) return "Deslopify needs a Cloudflare account ID (settings → Model access).";
     if (!settings.cloudflareApiToken) return "Deslopify needs a Cloudflare API token (settings → Model access).";
@@ -86,6 +90,7 @@ export function describeConfig(settings) {
     model: settings.provider === "cloudflare" ? settings.cloudflareModel : settings.model,
     endpoint: settings.provider === "cloudflare" ? "api.cloudflare.com (Workers AI)" : settings.baseUrl,
     credentialSet: settings.provider === "cloudflare" ? Boolean(settings.cloudflareApiToken) : Boolean(settings.apiKey),
+    demoMode: Boolean(settings.demoMode),
     enabled: settings.enabled,
     thresholds: {
       nugget: settings.nuggetThreshold,
