@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.png" />
+    <img src="assets/wordmark.png" alt="Deslopify" width="420" />
+  </picture>
+</p>
+
 # Deslopify
 
 A Chrome/Firefox extension that reads every post in your LinkedIn feed, asks [TypeSafe's
@@ -160,8 +167,9 @@ src/
   content/     post discovery/extraction, rendering (shadow DOM badge + panel), content.css
   popup/       toolbar popup: live per-tab status, counters, quick toggles
   options/     provider, reader profile, tuning, rate limits, cache
+assets/        source logos (icon.png, wordmark.png) — everything else is derived with `npm run icons`
 build.mjs      esbuild bundles per target + the Chrome/Firefox manifests
-scripts/       icon generator (no image dependencies)
+scripts/       icon + wordmark derivation from assets/, store assets, site build
 test/          unit, DOM (fixture in a real browser), e2e (real extension in Chromium)
 ```
 

@@ -94,7 +94,8 @@ img {
 }
 
 .brand img {
-  border-radius: 7px;
+  height: 40px;
+  width: auto;
 }
 
 .site-header nav {

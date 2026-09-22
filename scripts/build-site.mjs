@@ -130,8 +130,7 @@ export function policyDocument({ title, markdown, siteUrl }) {
   <body class="doc">
     <header class="site-header">
       <a class="brand" href="index.html">
-        <img src="assets/icon-128.png" alt="" width="28" height="28" />
-        <span>Deslopify</span>
+        <img src="assets/wordmark-dark.png" alt="Deslopify" width="116" height="40" />
       </a>
       <nav>
         <a href="index.html">Home</a>
@@ -179,5 +178,6 @@ const screenshots = [
 for (const file of screenshots) {
   await copyFile(resolve(root, "store/assets", file), resolve(assetsDir, file));
 }
+await copyFile(resolve(root, "assets/wordmark-dark.png"), resolve(assetsDir, "wordmark-dark.png"));
 
 console.log(`site built: docs/privacy.html (${policy.split("\n").length} lines of policy) + ${screenshots.length} assets`);
