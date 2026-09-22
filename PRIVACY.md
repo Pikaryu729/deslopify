@@ -47,6 +47,13 @@ Everything below stays in your browser's extension storage on your device:
 The cache holds verdicts and token counts, not copies of post text. You can clear it at any time from the popup or the
 settings page ("Clear cache"), and removing the extension deletes all of it.
 
+## Demo mode
+
+Demo mode is off by default. When it is on, Deslopify grades posts with a small heuristic that runs entirely inside the
+extension: **no API key is needed and no network requests are made at all** — nothing is sent anywhere, including to the
+provider you may have configured. Verdicts produced this way are labelled "demo" wherever they appear, and turning demo
+mode off restores normal grading.
+
 ## What Deslopify does not do
 
 - No analytics, telemetry, crash reporting, or usage tracking.

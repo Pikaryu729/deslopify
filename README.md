@@ -17,6 +17,11 @@ the verdict plus confidence. Click the badge for the full breakdown: the model's
 signals that moved the score, every signal with its value, the model name, and the token cost. Low-confidence calls
 get a dashed edge and a `?`.
 
+**No API key yet? Demo mode** grades posts with a small local heuristic — no key, no account, and no network requests
+at all. Every verdict it produces is labelled "demo", and switching to real grading is one settings toggle. It exists
+for two reasons: you can see what the extension does before signing up for a provider, and store reviewers can test it
+without being handed a paid credential.
+
 ## How it works
 
 1. A content script finds feed posts (`data-urn` / `feed-shared-update-v2` hooks, with class-substring and structural
@@ -45,6 +50,10 @@ npm run build          # writes dist/chrome and dist/firefox
 
 - **Chrome / Edge / Brave**: `chrome://extensions` → enable *Developer mode* → *Load unpacked* → `dist/chrome`.
 - **Firefox**: see [Installing on Firefox](#installing-on-firefox) below.
+
+Or skip the build: download the packaged zips from the [latest release](https://github.com/Pikaryu729/deslopify/releases)
+(`deslopify-chrome-*.zip` unzips to a folder you can load unpacked; the Firefox zip installs via *Load Temporary
+Add-on*).
 
 **Then reload your LinkedIn tab.** Content scripts only attach to pages loaded after the extension is installed, so a
 feed tab that was already open is invisible to Deslopify until you refresh it. The popup says so if that is the case.
@@ -86,7 +95,8 @@ and not publicly listed; updates are manual. Alternatively, on Firefox **Develop
 Requirements: Firefox **140+** (the manifest declares `data_collection_permissions`, which older versions do not
 understand), Firefox for Android 142+.
 
-Then open the extension's settings and pick a provider:
+Then open the extension's settings and pick a provider, **or press "Try demo mode"** in the popup to start with no
+key at all:
 
 - **TypeSafe API** (default): paste a key from <https://console.typesafe.ai/keys>. Model `jev-latest`.
 - **Cloudflare Workers AI**: account ID + API token, model `typesafe/jev`.
@@ -95,6 +105,7 @@ Hit **Test connection** — it makes one tiny jev call and reports the respondin
 
 ## Settings worth knowing
 
+- **Demo mode**: grade with a local heuristic — no API key, no network requests, verdicts labelled "demo".
 - **Verdict tuning**: golden-nugget and slop thresholds, the stricter nugget bar for off-topic posts, and the
   low-confidence cut-off. Thresholds are in normalised score units; raise the nugget threshold if you want a stricter
   definition of "nugget".
@@ -108,8 +119,9 @@ Hit **Test connection** — it makes one tiny jev call and reports the respondin
 
 Post text (plus author name, headline, and the flags listed above) is sent to the provider *you* configured, and
 nowhere else. No analytics, no Deslopify server, no other network calls. Keys live in browser extension storage.
-Verdicts are cached locally so repeat views do not re-send anything. Firefox's manifest declares
-`data_collection_permissions.required = ["websiteContent"]` for exactly this reason.
+Verdicts are cached locally so repeat views do not re-send anything. In demo mode the extension makes **no network
+requests at all**. Firefox's manifest declares `data_collection_permissions.required = ["websiteContent"]` for exactly
+this reason.
 
 ## Troubleshooting
 
@@ -202,3 +214,8 @@ errors during a full run.
   line, the on-page banner, and the `[Deslopify] active` console line exist so selector drift fails loudly instead of
   silently.
 - Image-only and video-only posts are skipped (nothing to read); they get a neutral outline and no verdict.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Not affiliated with, endorsed by, or sponsored by LinkedIn Corporation or TypeSafe;
+LinkedIn is a trademark of LinkedIn Corporation.

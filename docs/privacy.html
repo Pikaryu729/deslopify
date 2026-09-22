@@ -39,6 +39,8 @@
       <p>Everything below stays in your browser's extension storage on your device:</p>
       <ul><li>your settings, including your API key (so the extension can call your provider),</li><li>a local cache of verdicts, keyed by a hash of the post and your settings, so re-scrolling does not re-send anything,</li><li>counters such as how many posts were scored and how many tokens were used.</li></ul>
       <p>The cache holds verdicts and token counts, not copies of post text. You can clear it at any time from the popup or the settings page ("Clear cache"), and removing the extension deletes all of it.</p>
+      <h2 id="demo-mode">Demo mode</h2>
+      <p>Demo mode is off by default. When it is on, Deslopify grades posts with a small heuristic that runs entirely inside the extension: <strong>no API key is needed and no network requests are made at all</strong> — nothing is sent anywhere, including to the provider you may have configured. Verdicts produced this way are labelled "demo" wherever they appear, and turning demo mode off restores normal grading.</p>
       <h2 id="what-deslopify-does-not-do">What Deslopify does not do</h2>
       <ul><li>No analytics, telemetry, crash reporting, or usage tracking.</li><li>No advertising, no ad identifiers, no profiling.</li><li>No selling or sharing of data with anyone other than the provider you configured.</li><li>No remote code: every line of JavaScript runs from the extension package you installed.</li></ul>
       <h2 id="your-controls">Your controls</h2>

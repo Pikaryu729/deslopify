@@ -1,0 +1,51 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The DOM and e2e suites drive a real browser; Playwright's bundled Chromium
+      # is what `channel: "chromium"` resolves to.
+      - run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Mozilla add-on lint (AMO's own validator)
+        run: npm run lint:firefox
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: DOM tests
+        run: npm run test:dom
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      # Prove the store packages still build, and keep them as a build artifact.
+      - name: Package for both stores
+        run: npm run package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-packages
+          path: dist/artifacts/*
+          if-no-files-found: error
+          retention-days: 14

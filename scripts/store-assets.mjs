@@ -132,7 +132,7 @@ const STAGE_CSS = `
     font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #f2f4f7;
   }
   body::after {
-    content: "Runs on your own TypeSafe or Cloudflare key · no account · no analytics";
+    content: "No account, no analytics · runs on your own key, or demo mode with no key at all";
     position: fixed; bottom: 44px; left: 0; right: 0; text-align: center;
     font-size: 13px; color: #9aa1ab;
   }
