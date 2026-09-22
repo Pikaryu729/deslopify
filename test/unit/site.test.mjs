@@ -9,7 +9,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { inline, renderMarkdown } from "../../scripts/build-site.mjs";
+import { SITE_URL, inline, policyDocument, renderMarkdown } from "../../scripts/build-site.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -54,6 +54,15 @@ test("the real privacy policy renders completely", async () => {
   assert.match(html, /pikaryu729\.github\.io\/deslopify\/privacy\.html/, "the canonical URL is in the policy");
   assert.equal(html.includes("your-contact-email"), false, "the placeholder contact is gone");
   assert.equal(/<p>\s*<\/p>/.test(html), false, "no empty paragraphs");
+});
+
+test("the published policy page is not stale", async () => {
+  // docs/privacy.html is generated and committed. If PRIVACY.md changes without a
+  // rebuild, the stores would be linking to an out-of-date policy — so fail loudly.
+  const markdown = await readFile(resolve(root, "PRIVACY.md"), "utf8");
+  const expected = policyDocument({ title: "Deslopify — privacy policy", markdown, siteUrl: SITE_URL });
+  const published = await readFile(resolve(root, "docs/privacy.html"), "utf8");
+  assert.equal(published, expected, "run `npm run build:site` after editing PRIVACY.md");
 });
 
 test("the site has the pages the stores will be pointed at", async () => {

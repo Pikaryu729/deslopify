@@ -20,7 +20,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const docsDir = resolve(root, "docs");
 const assetsDir = resolve(docsDir, "assets");
 
-const SITE_URL = "https://pikaryu729.github.io/deslopify/";
+export const SITE_URL = "https://pikaryu729.github.io/deslopify/";
 
 /* --------------------------------------------------- tiny markdown subset */
 

@@ -16,17 +16,25 @@ plus the exact text to paste into each form.
 | Small promo tile (440×280) | `store/assets/promo-tile-440x280.png` |
 | Marquee tile (1400×560, optional) | `store/assets/marquee-1400x560.png` |
 | Store icon (128×128) | `store/assets/icon-128.png` |
-| Privacy policy | `PRIVACY.md` — **must be hosted at a public URL** before you submit |
+| Privacy policy | **live** at <https://pikaryu729.github.io/deslopify/privacy.html> (generated from `PRIVACY.md` by `npm run build:site`) |
 | Version | `package.json` only; `build.mjs` injects it into both manifests |
 
-You need, in order: a **hosted privacy policy URL**, a **Chrome Web Store developer account** (one-time US$5, 2FA
-required), and a **Mozilla account** for AMO (free).
+The privacy policy URL to give both stores is:
 
-Two things to decide before submitting:
+```
+https://pikaryu729.github.io/deslopify/privacy.html
+```
 
-1. **Fill in the contact email** at the bottom of `PRIVACY.md` (it currently says
-   `your-contact-email@example.com`) and publish it — a GitHub repo file, a GitHub Pages page, or any public URL works.
-2. **The extension needs the user's own API key to do anything.** A reviewer without a key sees the "Deslopify needs a
+That page is generated from `PRIVACY.md` and served by GitHub Pages from `main:/docs`, so editing the policy means
+editing `PRIVACY.md` and running `npm run build:site`. Its contact section points at the repository's issue tracker;
+swap in an email address there if you prefer.
+
+You still need a **Chrome Web Store developer account** (one-time US$5, 2FA required) and a **Mozilla account** for AMO
+(free).
+
+One thing to decide before submitting:
+
+**The extension needs the user's own API key to do anything.** A reviewer without a key sees the "Deslopify needs a
    TypeSafe API key" banner, and "requires an account/credentials I don't have" is a common rejection. Two options:
    - paste a **temporary TypeSafe key** into the Chrome *Test instructions* field (the cleanest fix), or
    - let me add a **demo mode** that returns canned verdicts without any API call, which doubles as a "try before you
@@ -71,7 +79,7 @@ in the extension itself.
 
 PRIVACY
 No account, no analytics, no Deslopify servers. Post text is sent only to the provider you configure with your own API
-key, and settings and verdicts stay in your browser. Full policy: <PRIVACY POLICY URL>
+key, and settings and verdicts stay in your browser. Full policy: https://pikaryu729.github.io/deslopify/privacy.html
 
 BEFORE YOU INSTALL
 You need an API key from TypeSafe (console.typesafe.ai) or a Cloudflare Workers AI token. The extension shows a clear
@@ -119,7 +127,7 @@ fetches JSON verdicts.
 personally identifying information, health, financial, authentication, communications, location, web history, and user
 activity are *not* collected. Then certify the limited-use statements.
 
-**Privacy policy URL**: your hosted `PRIVACY.md`.
+**Privacy policy URL**: `https://pikaryu729.github.io/deslopify/privacy.html`.
 
 ### 1.4 Distribution
 
@@ -168,7 +176,7 @@ goes live.
 - **Description**: reuse the Chrome detailed description above.
 - **Category**: Productivity
 - **Screenshots**: the four 1280×800 images in `store/assets/`
-- **Privacy policy**: your hosted `PRIVACY.md`
+- **Privacy policy**: `https://pikaryu729.github.io/deslopify/privacy.html`
 - **Data collection**: the manifest already declares
   `browser_specific_settings.gecko.data_collection_permissions.required = ["websiteContent"]`, which matches the policy.
   When asked what is transmitted, say: post text and author name/headline, sent to the AI provider the user configures
