@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Deslopify — feed signal filter",
+  "short_name": "Deslopify",
+  "version": "0.1.0",
+  "description": "Scores every LinkedIn post as a golden nugget, useful, or slop with TypeSafe's jev model, and highlights the feed as you scroll.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.typesafe.ai/*", "https://api.cloudflare.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Deslopify",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}

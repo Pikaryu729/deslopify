@@ -1,0 +1,30 @@
+{
+  "name": "deslopify",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser extension that scores LinkedIn posts as golden nugget, useful, or slop with TypeSafe's jev model.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/make-icons.mjs && node build.mjs",
+    "build:firefox-xpi": "web-ext build --source-dir=dist/firefox --artifacts-dir=dist/artifacts --overwrite-dest",
+    "package": "npm run build && node scripts/package-chrome.mjs && npm run build:firefox-xpi",
+    "store:assets": "node scripts/store-assets.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "dev:firefox": "web-ext run --source-dir=dist/firefox --browser-console",
+    "sign:firefox": "web-ext sign --source-dir=dist/firefox --artifacts-dir=dist/artifacts --channel=unlisted",
+    "icons": "node scripts/make-icons.mjs",
+    "test": "npm run test:unit && npm run test:dom && npm run test:e2e",
+    "test:unit": "node --test \"test/unit/*.test.mjs\"",
+    "test:dom": "node --test \"test/dom/*.test.mjs\"",
+    "test:e2e": "node --test \"test/e2e/*.test.mjs\"",
+    "lint:firefox": "web-ext lint --source-dir=dist/firefox --output=text",
+    "serve:mock": "node test/mock-typesafe-server.mjs",
+    "shots": "node scripts/screenshot.mjs",
+    "verify": "npm run build && npm run lint:firefox && npm test"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "1.63.0",
+    "web-ext": "^10.7.0"
+  }
+}

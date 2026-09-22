@@ -1,0 +1,101 @@
+<!doctype html>
+<!--
+  Worst case for LinkedIn markup drift: every class name is an opaque hash, there
+  are no `data-urn` / `data-id` hooks and no `feed-shared-*` classes. The only
+  reliable signals left are the author's profile link and the action bar wording —
+  exactly what the text-anchored discovery path is for.
+
+  It also contains a comment thread (Like + Reply, long text) that must not be
+  mistaken for a post.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>(7) Feed | LinkedIn</title>
+  </head>
+  <body>
+    <div id="root">
+      <main class="x-9f2c">
+        <div class="x-77aa">
+          <!-- post 1 -->
+          <div class="t-1a2b">
+            <div class="t-4d5e">
+              <a href="/in/dana-reyes" class="t-0f1a"><span class="t-nm">Dana Reyes</span></a>
+              <span class="t-hl">Staff Engineer at Northwind</span>
+              <span class="t-tm">3rd+ · 4h · Edited</span>
+              <button aria-label="Open control menu" class="t-mn">…</button>
+            </div>
+            <div class="t-bd">
+              <span dir="ltr"
+                >We rewrote our billing retry worker last month and the p99 latency on /charge dropped from 840ms to
+62ms. Three things mattered: an index scan that was really a seq scan over 40M rows, moving the exponential
+backoff into the worker instead of the HTTP layer, and cutting the payload we wrote to the audit table.</span
+              >
+            </div>
+            <div class="t-ab">
+              <button aria-label="Like" class="t-b">Like</button>
+              <button aria-label="Comment" class="t-b">Comment</button>
+              <button aria-label="Repost" class="t-b">Repost</button>
+              <button aria-label="Send" class="t-b">Send</button>
+            </div>
+          </div>
+
+          <!-- post 2, with a comment thread that must be ignored -->
+          <div class="t-1a2b">
+            <div class="t-4d5e">
+              <a href="/in/sam-patel" class="t-0f1a"><span class="t-nm">Sam Patel</span></a>
+              <span class="t-hl">Product manager</span>
+              <span class="t-tm">2nd · 6h</span>
+              <button aria-label="Open control menu" class="t-mn">…</button>
+            </div>
+            <div class="t-bd">
+              <span dir="ltr"
+                >Hot take: most roadmaps would be better if teams deleted half the items and shipped the boring
+reliability work first. Nobody gets promoted for that work, which is exactly why it piles up.</span
+              >
+            </div>
+            <div class="t-ab">
+              <button aria-label="Like" class="t-b">Like</button>
+              <button aria-label="Comment" class="t-b">Comment</button>
+              <button aria-label="Repost" class="t-b">Repost</button>
+              <button aria-label="Send" class="t-b">Send</button>
+            </div>
+            <div class="t-cm">
+              <a href="/in/randal-quinn" class="t-0f1a"><span class="t-nm">Randal Quinn</span></a>
+              <span dir="ltr"
+                >This is the part nobody wants to hear. I have seen three teams in two years burn a quarter each on
+features nobody asked for while the on-call rotation quietly fell apart around them.</span
+              >
+              <div class="t-cmab">
+                <button aria-label="Like" class="t-b">Like</button>
+                <button aria-label="Reply" class="t-b">Reply</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- post 3: engagement bait -->
+          <div class="t-1a2b">
+            <div class="t-4d5e">
+              <a href="/in/brittany-cole" class="t-0f1a"><span class="t-nm">Brittany Cole</span></a>
+              <span class="t-hl">Helping founders unlock their why</span>
+              <span class="t-tm">1st · 2h</span>
+              <button aria-label="Open control menu" class="t-mn">…</button>
+            </div>
+            <div class="t-bd">
+              <span dir="ltr"
+                >3 years ago I was crying in my car. I had nothing. Today I run a 7-figure agency. Comment "YES" and
+I'll send you my 47-page playbook for free. Agree? Repost if this helped you.</span
+              >
+            </div>
+            <div class="t-ab">
+              <button aria-label="Like" class="t-b">Like</button>
+              <button aria-label="Comment" class="t-b">Comment</button>
+              <button aria-label="Repost" class="t-b">Repost</button>
+              <button aria-label="Send" class="t-b">Send</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

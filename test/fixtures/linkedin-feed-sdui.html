@@ -1,0 +1,126 @@
+<!doctype html>
+<!--
+  LinkedIn's 2026 server-driven UI feed, as observed live: every feed item is a
+  `display: contents` wrapper (no box, so IntersectionObserver never fires on it),
+  class names are hashes, the body lives in `[data-testid=expandable-text-box]`
+  with the "… more" button *inside* it, the avatar link has no text, "Promoted"
+  is a plain <p> in the header, and the feed also carries a share box and a
+  "Recommended for you" module that must not be scored.
+
+  Layout lives in the stylesheet below rather than in style="" attributes on
+  purpose: the e2e suite serves this page under a strict `style-src 'self'` policy
+  (like LinkedIn's), and inline styles would be blocked — which would quietly stop
+  the page from reproducing `display: contents` at all.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Feed | LinkedIn</title>
+    <style>
+      .sdui-item {
+        display: contents;
+      }
+      .sdui-stack {
+        display: flex;
+        flex-direction: column;
+      }
+      .sdui-row {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div data-testid="mainFeed" class="d1901be7">
+        <!-- share box -->
+        <div data-lazy-mount-id="a1" class="sdui-item">
+          <div role="listitem" class="_3cc7a1bd">
+            <a href="/in/ryushinwells/"><figure aria-hidden="true"></figure></a>
+            <button class="_9b59792c">Start a post</button>
+            <p>Video</p><p>Photo</p>
+          </div>
+        </div>
+        <!-- real post -->
+        <div data-lazy-mount-id="a2" class="sdui-item">
+          <div class="e5616576 sdui-item" data-display-contents="">
+            <div class="_2d9fae83 sdui-stack">
+              <div class="_7df85784 sdui-row">
+                <a href="/in/louie-carvalho/"><figure aria-hidden="true"></figure></a>
+                <div>
+                  <p><a href="/in/louie-carvalho/"><span>Louie Carvalho</span></a></p>
+                  <p>• 3rd+</p>
+                  <p>Senior Software Engineer</p>
+                  <p>3d •</p>
+                </div>
+                <button aria-label="Open control menu for post by Louie Carvalho">…</button>
+                <button aria-label="Hide post by Louie Carvalho">×</button>
+              </div>
+              <p>
+                <span data-testid="expandable-text-box" class="_067b49b4"
+                  >In my team, I’m known as an ideas man: an innovator. A member from my leadership asked me in a 1:1 if
+I’m doing anything exciting with AI, personally or professionally. She was completely taken aback when I said no.
+Here is why I have not shipped a single AI feature this year, and what I am doing instead.<button
+                    data-testid="expandable-text-button">… more</button></span
+                >
+              </p>
+              <div class="_0c86f973">
+                <button aria-label="Reaction button state: no reaction">Like</button>
+                <button aria-label="Open reactions menu">▾</button>
+                <button aria-label="Comment">Comment</button>
+                <button aria-label="Repost">Repost</button>
+                <button aria-label="Send in a private message">Send</button>
+              </div>
+              <div class="_36fc6df4">
+                <a href="/in/randal-quinn/"><span>Randal Quinn</span></a>
+                <span data-testid="expandable-text-box"
+                  >This is a very long comment that is longer than the post itself and must never be mistaken for the
+post body. It goes on and on about nothing in particular, repeating itself so that it is definitely the longest
+text block inside this container by a comfortable margin, which is the whole point of this fixture paragraph.</span
+                >
+                <button aria-label="Like">Like</button>
+                <button aria-label="Reply">Reply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- promoted video post -->
+        <div data-lazy-mount-id="a3" class="sdui-item">
+          <div class="sdui-item" data-display-contents="">
+            <div class="sdui-stack">
+              <div class="sdui-row">
+                <a href="/company/delta-air-lines/"><figure aria-hidden="true"></figure></a>
+                <div>
+                  <p><a href="/company/delta-air-lines/"><span>Delta Air Lines</span></a></p>
+                  <p></p>
+                  <p>1,756,834 followers</p>
+                  <p>Promoted</p>
+                </div>
+                <button aria-label="Open control menu for post by Delta Air Lines">…</button>
+              </div>
+              <p><span data-testid="expandable-text-box">With a SkyMiles Membership, you can unlock a complimentary subscription to The Wall Street Journal on Delta Sync Wi-Fi.</span></p>
+              <video></video>
+              <div>
+                <button aria-label="Reaction button state: no reaction">Like</button>
+                <button aria-label="Comment">Comment</button>
+                <button aria-label="Repost">Repost</button>
+                <button aria-label="Send in a private message">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- recommended people module: not a post -->
+        <div data-lazy-mount-id="a4" class="sdui-item">
+          <div role="listitem">
+            <p>Recommended for you</p>
+            <a href="/in/salvador-guzman/"><span>Salvador Guzman</span></a>
+            <p>Talent @ OpenAI | ex-xAI | ex-Amazon, hiring across every function this quarter</p>
+            <button>Follow</button>
+            <a href="/in/calvin-c/"><span>Calvin C.</span></a>
+            <p>Tech Recruiter @ Fluidstack | ex-TikTok, building the infrastructure hiring team</p>
+            <button>Follow</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

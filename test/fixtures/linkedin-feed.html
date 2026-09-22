@@ -1,0 +1,192 @@
+<!doctype html>
+<!--
+  Fixture that mimics LinkedIn's feed markup closely enough to exercise the
+  content script's discovery and extraction layers: nested repost containers,
+  the actor header with duplicated screen-reader text, CSS-clamped post bodies,
+  a promoted post, and a media-only post.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>(3) Feed | LinkedIn</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; background: #f4f2ee; }
+      .scaffold-layout__main { max-width: 560px; margin: 0 auto; padding: 12px; }
+      .feed-shared-update-v2 { background: #fff; border-radius: 8px; margin-bottom: 8px; padding: 12px; }
+      .update-components-actor { display: flex; gap: 8px; align-items: center; }
+      .update-components-actor__image img { width: 48px; height: 48px; border-radius: 50%; }
+      .update-components-actor__title { font-weight: 600; display: block; }
+      .update-components-actor__description { color: #666; font-size: 12px; display: block; }
+      .update-components-actor__sub-description { color: #666; font-size: 12px; }
+      .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .update-components-text { margin: 8px 0; white-space: pre-wrap; }
+      .feed-shared-inline-show-more-text--is-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+      .feed-shared-social-action-bar { display: flex; gap: 12px; font-size: 13px; color: #666; border-top: 1px solid #eee; padding-top: 8px; }
+      .feed-shared-control-menu__trigger { margin-left: auto; }
+    </style>
+  </head>
+  <body>
+    <main class="scaffold-layout__main">
+      <div class="scaffold-finite-scroll__content" data-testid="mainFeed">
+        <!-- 1. golden nugget -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000001"
+          data-id="urn:li:activity:7300000000000000001"
+        >
+          <div class="feed-shared-update-v2__content">
+            <div class="update-components-actor">
+              <a class="update-components-actor__image" href="/in/dana-reyes">
+                <img src="avatar1.png" width="48" height="48" alt="Dana Reyes" />
+              </a>
+              <div class="update-components-actor__meta">
+                <span class="update-components-actor__title">
+                  <span aria-hidden="true">Dana Reyes</span>
+                  <span class="visually-hidden">View Dana Reyes’ profile</span>
+                </span>
+                <span class="update-components-actor__description">Staff Engineer at Northwind</span>
+                <span class="update-components-actor__sub-description">3rd+ · 4h · Edited</span>
+              </div>
+              <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+            </div>
+            <div class="feed-shared-update-v2__description-wrapper">
+              <div class="update-components-text">
+                <span dir="ltr"
+                  ><span
+                    >We rewrote our billing retry worker last month and the p99 latency on /charge dropped from 840ms to
+62ms. Three things mattered: an index scan that was really a seq scan over 40M rows, moving the exponential
+backoff into the worker instead of the HTTP layer, and cutting the payload we wrote to the audit table. The
+index used 3.1GB; after the change it uses 240MB. Full write-up in the comments.</span
+                  ></span
+                >
+              </div>
+            </div>
+            <div class="feed-shared-social-action-bar"><span>Like</span><span>Comment</span><span>Repost</span></div>
+          </div>
+        </div>
+
+        <!-- 2. useful -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000002"
+          data-id="urn:li:activity:7300000000000000002"
+        >
+          <div class="feed-shared-update-v2__content">
+            <div class="update-components-actor">
+              <a class="update-components-actor__image" href="/in/sam-patel"><img src="avatar2.png" width="48" height="48" alt="Sam Patel" /></a>
+              <div class="update-components-actor__meta">
+                <span class="update-components-actor__title">
+                  <span aria-hidden="true">Sam Patel</span>
+                  <span class="visually-hidden">View Sam Patel’s profile</span>
+                </span>
+                <span class="update-components-actor__description">Product manager</span>
+                <span class="update-components-actor__sub-description">2nd · 6h</span>
+              </div>
+              <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+            </div>
+            <div class="update-components-text">
+              <span dir="ltr"
+                >Hot take: most roadmaps would be better if teams deleted half the items and shipped the boring
+reliability work first. Nobody gets promoted for that work, which is exactly why it piles up.</span
+              >
+            </div>
+            <div class="feed-shared-social-action-bar"><span>Like</span><span>Comment</span></div>
+          </div>
+        </div>
+
+        <!-- 3. slop -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000003"
+          data-id="urn:li:activity:7300000000000000003"
+        >
+          <div class="feed-shared-update-v2__content">
+            <div class="update-components-actor">
+              <a class="update-components-actor__image" href="/in/brittany-cole"><img src="avatar3.png" width="48" height="48" alt="Brittany Cole" /></a>
+              <div class="update-components-actor__meta">
+                <span class="update-components-actor__title">
+                  <span aria-hidden="true">Brittany Cole</span>
+                  <span class="visually-hidden">View Brittany Cole’s profile</span>
+                </span>
+                <span class="update-components-actor__description">Helping founders unlock their why</span>
+                <span class="update-components-actor__sub-description">1st · 2h</span>
+              </div>
+              <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+            </div>
+            <div class="update-components-text">
+              <span dir="ltr"
+                >3 years ago I was crying in my car.
+I had nothing.
+Today I run a 7-figure agency.
+Here is what nobody tells you about success:
+
+Comment "YES" and I’ll send you my 47-page playbook for free.
+Agree? ♻️ Repost if this helped you.</span
+              >
+            </div>
+            <div class="feed-shared-social-action-bar"><span>Like</span><span>Comment</span></div>
+          </div>
+        </div>
+
+        <!-- 4. media only, no text -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000004"
+          data-id="urn:li:activity:7300000000000000004"
+        >
+          <div class="update-components-actor">
+            <a class="update-components-actor__image" href="/in/lena"><img src="avatar4.png" width="48" height="48" alt="Lena Ortiz" /></a>
+            <span class="update-components-actor__title"><span aria-hidden="true">Lena Ortiz</span></span>
+            <span class="update-components-actor__sub-description">3rd+ · 1h</span>
+            <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+          </div>
+          <div class="update-components-image"><img src="chart.png" width="520" height="300" alt="" /></div>
+        </div>
+
+        <!-- 5. promoted -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000005"
+          data-id="urn:li:activity:7300000000000000005"
+        >
+          <div class="update-components-actor">
+            <a class="update-components-actor__image" href="/company/vectorbase"><img src="logo.png" width="48" height="48" alt="VectorBase" /></a>
+            <div class="update-components-actor__meta">
+              <span class="update-components-actor__title"><span aria-hidden="true">VectorBase</span></span>
+              <span class="update-components-actor__sub-description">Promoted</span>
+            </div>
+            <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+          </div>
+          <div class="update-components-text">
+            <span dir="ltr">Ship faster with VectorBase. Our platform helps teams move quickly with less toil. Book a demo today.</span>
+          </div>
+        </div>
+
+        <!-- 6. repost wrapping an original post -->
+        <div
+          class="feed-shared-update-v2"
+          data-urn="urn:li:activity:7300000000000000006"
+          data-id="urn:li:activity:7300000000000000006"
+        >
+          <div class="update-components-actor">
+            <a class="update-components-actor__image" href="/in/omar"><img src="avatar5.png" width="48" height="48" alt="Omar Haddad" /></a>
+            <div class="update-components-actor__meta">
+              <span class="update-components-actor__title"><span aria-hidden="true">Omar Haddad</span></span>
+              <span class="update-components-actor__sub-description">2nd · 3h</span>
+            </div>
+            <button class="feed-shared-control-menu__trigger" aria-label="Open control menu">…</button>
+          </div>
+          <div class="update-components-header__text-view">Omar Haddad reposted this</div>
+          <div class="feed-shared-update-v2" data-urn="urn:li:activity:7300000000000000007">
+            <div class="update-components-actor">
+              <span class="update-components-actor__title"><span aria-hidden="true">Priya Nair</span></span>
+            </div>
+            <div class="update-components-text">
+              <span dir="ltr">We measured how long reviewers take per 400-line pull request. Median was 71 minutes, and half of that was rebuilding context. Smaller PRs were not faster per line, they were just reviewed sooner.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Deslopify</title>
+    <link rel="stylesheet" href="ui.css" />
+  </head>
+  <body class="popup">
+    <header class="app">
+      <img src="icons/icon-32.png" alt="" />
+      <h1>Deslopify</h1>
+      <span class="grow"></span>
+      <label class="switch" title="Turn highlighting on or off">
+        <input type="checkbox" id="enabled" data-setting="enabled" />
+        <span class="muted">On</span>
+      </label>
+    </header>
+
+    <div style="padding: 12px">
+      <div id="no-key" class="card" hidden>
+        <strong>No API key yet.</strong>
+        <p class="hint">Add your TypeSafe key and Deslopify starts scoring posts as you scroll.</p>
+        <button class="primary" id="open-options-key" style="margin-top: 8px">Set up Deslopify</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat nugget">
+          <div class="value" id="count-nugget">0</div>
+          <div class="label">Nuggets</div>
+        </div>
+        <div class="stat useful">
+          <div class="value" id="count-useful">0</div>
+          <div class="label">Useful</div>
+        </div>
+        <div class="stat slop">
+          <div class="value" id="count-slop">0</div>
+          <div class="label">Slop</div>
+        </div>
+      </div>
+
+      <p class="hint" id="usage">—</p>
+      <p class="hint" id="page-status"></p>
+
+      <h2>While scrolling</h2>
+      <label class="switch"><input type="checkbox" data-setting="showBadges" /> Show verdict badges</label>
+      <label class="switch"><input type="checkbox" data-setting="dimSlop" /> Fade slop posts</label>
+      <label class="switch"><input type="checkbox" data-setting="hideSlop" /> Collapse slop posts</label>
+
+      <div class="legend" style="margin-top: 10px">
+        <span class="dot" style="background: var(--nugget)"></span> golden nugget
+        <span class="dot" style="background: var(--useful)"></span> useful
+        <span class="dot" style="background: var(--slop)"></span> slop
+      </div>
+
+      <div id="config-warning" class="card" hidden style="border-color: var(--nugget)">
+        <strong id="config-problem"></strong>
+      </div>
+
+      <div class="row" style="margin-top: 14px">
+        <button id="open-options">Settings</button>
+        <button id="clear-cache">Clear cache</button>
+        <button id="copy-diagnostics">Diagnostics</button>
+      </div>
+      <div class="status" id="status"></div>
+      <p class="hint" id="last-error" hidden></p>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
