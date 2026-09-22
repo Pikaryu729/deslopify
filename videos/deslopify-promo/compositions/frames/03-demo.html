@@ -43,8 +43,8 @@
 
       /* right: the real screen capture, cropped to the LinkedIn page (OS + browser chrome removed).
          Source 1280×720; page region x 340..930, y 88..684, shown at 1.4× → 826×834.
-         The feed column (x 470..752, y 118..684) is blurred in the asset itself so no real person's
-         name, face, or post is shown next to a verdict; the unblurred take stays in capture/ (gitignored). */
+         The asset is the 15s used here (raw 34.0–49.0s), with each person's avatar, name, and headline
+         blurred in it, tracked through the scroll; the raw take stays in capture/ (gitignored). */
       [id="f03-demo-window"] {
         position: absolute; left: 867px; top: 123px; width: 826px; height: 834px;
         border-radius: 14px;
@@ -80,7 +80,7 @@
         src="assets/demo-capture.mp4"
         data-start="0"
         data-duration="14"
-        data-media-start="34.5"
+        data-media-start="0.5"
         data-track-index="2"
         muted
         playsinline
